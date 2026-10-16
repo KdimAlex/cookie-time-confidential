@@ -87,8 +87,8 @@ const FLOW = [
   { n: 24, frame: "Almost done", kind: "say", text: "Great job! You are almost done with your training." },
   { n: 25, frame: "Thunderstorm", kind: "storm", mode: "sky", src: "/transition?t=7.2", text: "But oh, no! A thunderstorm is approaching. Your navigation systems could get damaged. Can you identify the guiding star after getting struck by lightning? Use the pointer to click on the labeled star after your navigation system is struck." },
   { n: 26, frame: "Game 3 — Find the guiding star", kind: "find", mode: "game", live: true },
-  { n: 27, frame: "Certified", kind: "say", text: "Great work, cadet {name}! Congratulations on completing your training. You are now a certified Space Navigator!" },
-  { n: 28, frame: "Print", kind: "print", mode: "print", live: true, text: "This was Morehead Planetarium training." },
+  { n: 27, frame: "Certified", kind: "say", text: "Great work, cadet {name}! Congratulations on completing your training." },
+  { n: 28, frame: "Print", kind: "print", mode: "print", live: true, text: "Let's see what designation you earned in training." },
 ];
 
 const state = {
@@ -139,18 +139,105 @@ function fill(text) {
 
 let typeTimer = 0;
 let typing = false;
+let textCtx = null;
+let textBuf = null;
+let textVoices = [];
+let chirpAt = 0;
+
+/* Chirp onsets in the first 5s of the digital-text effect, pulled back
+   a few milliseconds so each slice includes the attack and not the next hit. */
+const TEXT_CHIRPS = [0.446, 0.536, 0.624, 0.714, 0.804, 0.892, 0.982, 1.07, 1.16, 1.25, 1.34, 1.428, 1.518, 1.606, 1.696, 1.786, 1.874, 1.964, 2.052, 2.142, 2.232, 2.696, 2.786, 2.874, 2.964, 3.052, 3.746, 3.834, 3.924, 4.014, 4.104, 4.192, 4.282, 4.37, 4.46, 4.55];
+const TEXT_SLICE = 0.068;
+
+function textAudio() {
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+  if (!textCtx) textCtx = new Ctx();
+  if (textCtx.state === "suspended") textCtx.resume();
+  return textCtx;
+}
+
+function loadTextTick() {
+  if (textBuf || loadTextTick.busy) return;
+  loadTextTick.busy = true;
+  fetch("/audio/text-out.wav")
+    .then((res) => {
+      if (!res.ok) throw new Error(String(res.status));
+      return res.arrayBuffer();
+    })
+    .then((raw) => {
+      const ctx = textAudio();
+      if (!ctx) return null;
+      return ctx.decodeAudioData(raw.slice(0));
+    })
+    .then((buf) => { textBuf = buf || null; })
+    .catch(() => { loadTextTick.busy = false; });
+}
+
+function stopTextTick() {
+  const voices = textVoices.splice(0);
+  if (!textCtx) return;
+  const now = textCtx.currentTime;
+  for (const voice of voices) {
+    try {
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(Math.max(0.0001, voice.gain.gain.value), now);
+      voice.gain.gain.linearRampToValueAtTime(0.0001, now + 0.012);
+      voice.src.stop(now + 0.016);
+    } catch (err) { /* already ended */ }
+  }
+}
+
+/* One chirp per spoken glyph, sliced from the clip in order. The slice
+   speeds up just enough to finish inside a fast letter gap, and a comma
+   or period plays once then stays quiet through the hang. */
+function tickText(ch, gapMs) {
+  if (!ch || ch === " " || !textBuf) return;
+  const ctx = textAudio();
+  if (!ctx) return;
+  const offset = TEXT_CHIRPS[chirpAt % TEXT_CHIRPS.length];
+  chirpAt += 1;
+  const gap = gapMs == null ? TEXT_SLICE : Math.max(0.012, gapMs / 1000);
+  let rate = 1;
+  if (gap < TEXT_SLICE) rate = Math.min(1.45, TEXT_SLICE / Math.max(0.03, gap * 0.92));
+  rate *= 0.98 + Math.random() * 0.05;
+  const heard = TEXT_SLICE / rate;
+  const src = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  src.buffer = textBuf;
+  src.playbackRate.value = rate;
+  const held = ".!?".includes(ch);
+  const comma = ",;:".includes(ch);
+  const level = held ? 0.62 : comma ? 0.5 : 0.4 + Math.random() * 0.08;
+  const now = ctx.currentTime;
+  gain.gain.setValueAtTime(level, now);
+  gain.gain.setValueAtTime(level, now + Math.max(0.008, heard - 0.016));
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + heard);
+  src.connect(gain);
+  gain.connect(ctx.destination);
+  const voice = { src, gain };
+  textVoices.push(voice);
+  src.onended = () => {
+    const at = textVoices.indexOf(voice);
+    if (at >= 0) textVoices.splice(at, 1);
+  };
+  src.start(now, offset, TEXT_SLICE);
+  src.stop(now + heard + 0.02);
+}
 
 function stopTyping() {
   window.clearTimeout(typeTimer);
   typeTimer = 0;
   typing = false;
   terminal.classList.remove("is-typing");
+  stopTextTick();
 }
 
 /* A terminal, not a metronome: most glyphs tick quickly, spaces rush,
    punctuation hangs, and the occasional hitch breaks the rhythm. */
 function typeLine(text) {
   stopTyping();
+  textAudio();
   const full = fill(text);
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduce || full.length < 2) {
@@ -166,18 +253,22 @@ function typeLine(text) {
     if (stamp !== epoch) return;
     i += 1;
     line.textContent = full.slice(0, i);
-    if (i >= full.length) {
-      typing = false;
-      terminal.classList.remove("is-typing");
-      return;
-    }
     const ch = full[i - 1];
+    const last = i >= full.length;
     let delay = 14 + Math.random() * 26;
     if (ch === " ") delay = 6 + Math.random() * 10;
     else if (".!?".includes(ch)) delay = 160 + Math.random() * 200;
     else if (",;:".includes(ch)) delay = 70 + Math.random() * 80;
-    if (Math.random() < 0.12) delay = 4 + Math.random() * 8;
-    else if (Math.random() < 0.07) delay += 50 + Math.random() * 90;
+    if (!last) {
+      if (Math.random() < 0.12) delay = 4 + Math.random() * 8;
+      else if (Math.random() < 0.07) delay += 50 + Math.random() * 90;
+    }
+    tickText(ch, last ? null : delay);
+    if (last) {
+      typing = false;
+      terminal.classList.remove("is-typing");
+      return;
+    }
     typeTimer = window.setTimeout(stepChar, delay);
   };
   typeTimer = window.setTimeout(stepChar, 30);
@@ -917,15 +1008,19 @@ function designationTitle(graded) {
   return named.title || "ENGINEER";
 }
 
-/* Expand 0.85s + left dock 0.72s, then the meters sketch, then the arc,
-   then a 2.2s idle, then a 1.15s feed that matches the cloth exit. */
+/* Forward: the line is already solid. The medal parks on the left with the
+   title still blank, the meters rise, the designation types, then the
+   instructor terminal is removed, then the existing feed-off plays.
+   Hold is after the cloth has left.
+   A direct ?at= or reduced motion holds the composed pose instead. */
 const PRINT = {
-  land: 0.52,
-  fill: 1.22,
-  stagger: 0.55,
-  lag: 0.36,
-  idle: 2,
-  feed: 1.05,
+  land: 0.28,
+  fill: 0.62,
+  stagger: 0.16,
+  lag: 0.18,
+  cause: 220,
+  payoff: 450,
+  hold: 3000,
 };
 
 function sketchSeconds() {
@@ -962,7 +1057,13 @@ function seatReport(stage) {
     width = frame.width - pad - left;
   }
   const top = Math.max(12, mark.top - frame.top);
-  const bottom = Math.min(frame.height - 12, mark.bottom - frame.top);
+  let bottom = Math.min(frame.height - 12, mark.bottom - frame.top);
+  const bubble = document.getElementById("terminal");
+  if (bubble && !bubble.hidden) {
+    const box = bubble.getBoundingClientRect();
+    if (box.height > 8) bottom = Math.min(bottom, box.top - frame.top - 14);
+  }
+  if (bottom - top < 168) bottom = top + 168;
   stage.style.left = `${left}px`;
   stage.style.right = "auto";
   stage.style.width = `${Math.max(180, width)}px`;
@@ -981,57 +1082,40 @@ function mountPrint(entered) {
   };
   const wrap = document.createElement("div");
   wrap.className = "report";
-  wrap.dataset.finale = "expand";
+  wrap.dataset.finale = "line";
   wrap.dataset.title = title;
   wrap.style.setProperty("--land", `${PRINT.land}s`);
   wrap.style.setProperty("--fill-time", `${PRINT.fill}s`);
   wrap.style.setProperty("--stagger", `${PRINT.stagger}s`);
   wrap.style.setProperty("--lag", `${PRINT.lag}s`);
-  wrap.style.setProperty("--idle", `${PRINT.idle}s`);
-  wrap.style.setProperty("--feed", `${PRINT.feed}s`);
   wrap.setAttribute("role", "region");
-  wrap.setAttribute("aria-label", title);
+  wrap.setAttribute("aria-label", "Training evaluation");
   const stage = document.createElement("div");
   stage.className = "report-stage";
   const meters = document.createElement("div");
   meters.className = "report-meters";
   [
-    ["memory", "MEMORY", "/kiosk/art/report-memory.svg?v=1", "/kiosk/art/report-fill-memory.svg?v=1", "18.498%"],
-    ["agility", "AGILITY", "/kiosk/art/report-agility.svg?v=1", "/kiosk/art/report-fill-agility.svg?v=1", "21.795%"],
-    ["control", "CONTROL", "/kiosk/art/report-control.svg?v=1", "/kiosk/art/report-fill-control.svg?v=1", "20.879%"],
-  ].forEach(([key, name, labelSrc, fillSrc, labelWidth]) => {
+    ["memory", "MEMORY"],
+    ["agility", "AGILITY"],
+    ["control", "CONTROL"],
+  ].forEach(([key, name]) => {
     const meter = document.createElement("div");
     meter.className = "meter";
     meter.dataset.meter = key;
     meter.style.setProperty("--fill", `${(fills[key] * 100).toFixed(2)}%`);
-    const label = document.createElement("img");
+    const label = document.createElement("p");
     label.className = "meter-label";
-    label.src = labelSrc;
-    label.alt = name;
-    label.style.width = labelWidth;
+    label.textContent = name;
     const track = document.createElement("div");
     track.className = "meter-track";
-    const edge = document.createElement("img");
-    edge.className = "meter-edge";
-    edge.src = "/kiosk/art/report-meter-track.svg?v=1";
-    edge.alt = "";
     const fill = document.createElement("span");
     fill.className = "meter-fill";
-    fill.style.backgroundImage = `url("${fillSrc}")`;
-    track.append(edge, fill);
+    track.appendChild(fill);
     meter.append(label, track);
     meters.appendChild(meter);
   });
-  const send = document.createElement("button");
-  send.type = "button";
-  send.className = "report-send";
-  send.textContent = "send to kiosk printer";
-  send.addEventListener("click", () => {
-    send.disabled = true;
-    send.textContent = "YOUR BADGE IS PRINTING…";
-  });
-  stage.append(meters);
-  wrap.append(stage, send);
+  stage.appendChild(meters);
+  wrap.appendChild(stage);
   plate.appendChild(wrap);
 
   const alive = () => stamp === epoch && wrap.isConnected;
@@ -1039,93 +1123,40 @@ function mountPrint(entered) {
   withBadge(async (patch) => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!alive()) return;
-    if (reduce) {
-      await patch.hold({ ...finaleSpec(title), pose: "report", title });
+    /* A jump or reduced motion holds the composed pose: title on, meters full,
+       speech still up. Walking in from the previous step plays the clip. */
+    if (!entered || reduce) {
+      await patch.hold({ ...finaleSpec(title), pose: "aside", title });
       if (!alive()) return;
       seatReport(stage);
-      placePrinter(stage, send, 0);
-      wrap.dataset.finale = "print";
+      wrap.dataset.finale = "settled";
       wrap.classList.add("is-on", "is-settled");
       return;
     }
-    /* A direct arrival has no parked medal yet. Paint the dock, marks
-       already seated, then expand. Stepping in from Certified is already there. */
-    if (!entered) await patch.hold(finaleSpec(""));
-    if (!alive()) return;
-    await patch.stagePrint();
+    if (typeof patch.presentAside === "function") await patch.presentAside();
+    else await patch.hold({ ...finaleSpec(""), pose: "aside" });
     if (!alive()) return;
     seatReport(stage);
     wrap.dataset.finale = "stats";
     wrap.classList.add("is-on");
-    await wait(Math.round(sketchSeconds() * 1000) + 50);
+    await wait(Math.round(sketchSeconds() * 1000) + 40);
+    if (!alive()) return;
+    await wait(PRINT.cause);
     if (!alive()) return;
     wrap.dataset.finale = "title";
     await patch.title(title);
     if (!alive()) return;
-    wrap.dataset.finale = "idle";
-    wrap.classList.add("is-hold");
-    await patch.linger(PRINT.idle);
+    await wait(PRINT.payoff);
     if (!alive()) return;
-    wrap.classList.remove("is-hold");
-    wrap.dataset.finale = "print";
-    wrap.classList.add("is-printing");
-    meetPrinter(patch, stage, send, alive);
-  });
-}
-
-/* The cloth and the meters drop the same distance. The printer line is the
-   place they arrive, just above the speech box, and it comes in with them. */
-function porticoBottom() {
-  const host = plate.getBoundingClientRect();
-  const terminal = document.getElementById("terminal");
-  if (terminal && !terminal.hidden) {
-    const term = terminal.getBoundingClientRect();
-    if (term.height > 8 && term.top > host.top + 80) return term.top;
-  }
-  return host.bottom;
-}
-
-function placePrinter(stage, send, drop) {
-  const host = plate.getBoundingClientRect();
-  const meters = stage.querySelector(".report-meters");
-  const metersBox = meters ? meters.getBoundingClientRect() : stage.getBoundingClientRect();
-  const buttonH = 52;
-  const gap = 16;
-  const floor = porticoBottom() - host.top;
-  let buttonTop = metersBox.bottom - host.top + drop + gap;
-  if (buttonTop + buttonH > floor - 6) buttonTop = Math.max(8, floor - 6 - buttonH);
-  send.style.left = `${metersBox.left - host.left + metersBox.width / 2}px`;
-  send.style.right = "auto";
-  send.style.bottom = "auto";
-  send.style.top = `${buttonTop}px`;
-}
-
-function meetPrinter(patch, stage, send, alive) {
-  const medal = document.querySelector("#badge .badge-place");
-  const mark = medal ? medal.getBoundingClientRect() : stage.getBoundingClientRect();
-  const slide = (patch && patch.printSlide) || { duration: PRINT.feed, ease: "power2.inOut" };
-  const floor = porticoBottom() - 8;
-  const room = floor - mark.bottom - 16;
-  const drop = Math.round(Math.max(0, Math.min(room * 0.72, Math.max(36, mark.height * 0.2))));
-  placePrinter(stage, send, drop);
-  if (!window.gsap) return;
-  if (patch && typeof patch.dropToPrint === "function") patch.dropToPrint(drop);
-  else if (medal) window.gsap.to(medal, { y: drop, duration: slide.duration, ease: slide.ease, overwrite: "auto" });
-  window.gsap.to(stage, { y: drop, duration: slide.duration, ease: slide.ease, overwrite: "auto" });
-  window.gsap.fromTo(send, {
-    autoAlpha: 0,
-    xPercent: -50,
-    y: 22,
-  }, {
-    autoAlpha: 1,
-    xPercent: -50,
-    y: 0,
-    duration: slide.duration,
-    ease: slide.ease,
-    overwrite: "auto",
-    onComplete: () => {
-      if (alive()) send.style.pointerEvents = "auto";
-    },
+    wrap.dataset.finale = "away";
+    terminal.hidden = true;
+    line.textContent = "";
+    if (typeof patch.sendOff === "function") await patch.sendOff();
+    if (!alive()) return;
+    wrap.dataset.finale = "quiet";
+    await wait(PRINT.hold);
+    if (!alive()) return;
+    if (current < FLOW.length && FLOW[current - 1] && FLOW[current - 1].kind === "print") go(current + 1);
   });
 }
 
@@ -1233,6 +1264,7 @@ function go(n, holdWorld, holdSlot) {
   document.body.classList.toggle("is-triangle", step.plate === "angle");
   document.body.classList.toggle("is-rusty-quote", isRustyQuote(step));
   document.body.classList.toggle("is-duke-quote", step.art === "duke");
+  document.body.classList.remove("is-sendoff");
   const backdrop = step.world ? artUrl(step.world) : BUILDING;
   if (!holdWorld && world.getAttribute("src") !== backdrop) {
     world.src = backdrop;
@@ -1860,6 +1892,7 @@ badgeReady.then((mounted) => {
 
 const params = new URLSearchParams(location.search);
 const at = Number(params.get("at"));
+loadTextTick();
 go(Number.isFinite(at) && at >= 1 && at <= FLOW.length ? at : 1);
 
 /* The align and find bed. One player for the whole kiosk, so the games
@@ -1934,7 +1967,8 @@ function loopKioskBed() {
   if (duration > 2 && time > 1 && duration - time < 0.35) bed.seekTo(0, true);
 }
 
-window.addEventListener("pointerdown", startKioskBed, true);
-window.addEventListener("keydown", startKioskBed, true);
+window.addEventListener("pointerdown", () => { startKioskBed(); textAudio(); loadTextTick(); }, true);
+window.addEventListener("keydown", () => { startKioskBed(); textAudio(); loadTextTick(); }, true);
+loadTextTick();
 loadKioskBed();
 window.setInterval(loopKioskBed, 200);

@@ -15,12 +15,13 @@
 html, body {
   margin: 0;
   height: 100%;
+  background: #000;
 }
 
 body {
   display: flex;
   flex-direction: column;
-  background: #e6e6e6;
+  background: #000;
   color: #fff;
   font-family: var(--ctc-font-grotesque);
 }
@@ -45,24 +46,29 @@ body {
   gap: 10px;
   height: 36px;
   padding: 0 10px;
-  background: #ececec;
+  background: #000;
   color: #6d6d6d;
   font-size: 13px;
 }
 
 #critique button {
-  border: 2px solid var(--green);
-  background: var(--pill);
-  color: var(--green);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #6d6d6d;
   font: inherit;
-  font-weight: 700;
-  border-radius: 999px;
+  font-weight: 400;
+  letter-spacing: normal;
   cursor: pointer;
-  padding: 3px 12px;
-  line-height: 1.2;
+  padding: 4px 8px;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  min-height: 0;
 }
 
-#critique button:hover { text-decoration: none; }
+#critique button:hover { text-decoration: underline; }
 
 #where {
   margin: 0;
@@ -335,8 +341,7 @@ body[data-mode="game"] #plate {
   bottom: 0;
 }
 
-/* The portico stays behind the finale. The speech box keeps its place
-   and stays above the plate so the Morehead line can be read. */
+/* The portico stays behind the finale. The speech box keeps its place. */
 body[data-mode="print"] #terminal {
   visibility: visible;
   z-index: 8;
@@ -968,14 +973,13 @@ button.pill {
 
 .trace svg { touch-action: none; cursor: crosshair; background: var(--space); border-radius: 12px; }
 
-/* Print finale. The medal sits large on the left. These meters sketch in
-   on its right, then idle, then feed downward with the cloth. */
+/* Print finale. The medal sits large on the left. These meters rule in
+   on its right and fill to the score. They stay put when the cloth exits. */
 .report {
-  --land: 0.52s;
-  --fill-time: 1.22s;
-  --stagger: 0.55s;
-  --lag: 0.36s;
-  --idle: 2.2s;
+  --land: 0.28s;
+  --fill-time: 0.62s;
+  --stagger: 0.16s;
+  --lag: 0.18s;
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -999,65 +1003,65 @@ button.pill {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 7%;
+  gap: 3.4cqh;
 }
 
 .meter { width: 100%; }
 
 .meter-label {
-  display: block;
-  height: auto;
-  margin: 0 0 2.2% 0;
+  margin: 0 0 1cqh;
+  font-family: var(--ctc-font-grotesque);
+  font-size: clamp(16px, 3.5cqh, 28px);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  color: #f8f9ea;
+  text-transform: uppercase;
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(14px);
 }
 
 .meter-track {
   position: relative;
   width: 100%;
-  aspect-ratio: 546 / 66;
-}
-
-.meter-edge {
-  display: block;
-  width: 100%;
-  height: 100%;
+  height: clamp(42px, 7.4cqh, 56px);
+  border: 3px solid var(--green);
+  background: #07140e;
+  box-sizing: border-box;
+  overflow: hidden;
   opacity: 0;
-  clip-path: inset(0 100% 0 0);
+  transform: translateY(10px);
 }
 
 .meter-fill {
   position: absolute;
-  left: 2.4725%;
-  top: 20.4545%;
-  height: 59.0909%;
+  left: 0;
+  top: 0;
+  bottom: 0;
   width: 0;
-  background-color: #42f489;
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: 100% 100%;
+  background: var(--green);
 }
 
 .report.is-on .meter-label {
   animation: report-land var(--land) cubic-bezier(0.16, 0.84, 0.22, 1) forwards;
 }
 
-.report.is-on .meter-edge {
-  animation: track-sketch var(--land) cubic-bezier(0.16, 0.84, 0.22, 1) forwards;
+.report.is-on .meter-track {
+  animation: report-land var(--land) cubic-bezier(0.16, 0.84, 0.22, 1) forwards;
 }
 
 .report.is-on .meter-fill {
-  animation: meter-weigh var(--fill-time) cubic-bezier(0.55, 0.04, 0.12, 1) forwards;
+  animation: meter-weigh var(--fill-time) cubic-bezier(0.16, 0.84, 0.28, 1) forwards;
 }
 
 .report.is-on .meter:nth-child(1) .meter-label,
-.report.is-on .meter:nth-child(1) .meter-edge { animation-delay: 0s; }
+.report.is-on .meter:nth-child(1) .meter-track { animation-delay: 0s; }
 
 .report.is-on .meter:nth-child(2) .meter-label,
-.report.is-on .meter:nth-child(2) .meter-edge { animation-delay: var(--stagger); }
+.report.is-on .meter:nth-child(2) .meter-track { animation-delay: var(--stagger); }
 
 .report.is-on .meter:nth-child(3) .meter-label,
-.report.is-on .meter:nth-child(3) .meter-edge { animation-delay: calc(var(--stagger) * 2); }
+.report.is-on .meter:nth-child(3) .meter-track { animation-delay: calc(var(--stagger) * 2); }
 
 .report.is-on .meter:nth-child(1) .meter-fill { animation-delay: var(--lag); }
 
@@ -1065,42 +1069,21 @@ button.pill {
 
 .report.is-on .meter:nth-child(3) .meter-fill { animation-delay: calc(var(--stagger) * 2 + var(--lag)); }
 
-.report.is-hold .report-meters {
-  animation: report-idle var(--idle) ease-in-out forwards;
-}
-
-.report-send {
-  position: absolute;
-  left: 50%;
-  bottom: 6.5%;
-  margin: 0;
-  padding: 0 28px;
-  height: 64px;
-  border: var(--ctc-button-stroke) solid var(--green);
-  border-radius: 999px;
-  background: var(--pill);
-  color: var(--green);
-  font-family: var(--ctc-font-grotesque);
-  font-size: var(--ctc-button-size);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.report-send:disabled { cursor: default; }
-
 @keyframes report-land {
-  from { opacity: 0; transform: translateY(18px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes track-sketch {
-  0% { opacity: 1; clip-path: inset(0 100% 0 0); }
-  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+.report.is-settled .meter-label,
+.report.is-settled .meter-track {
+  animation: none;
+  opacity: 1;
+  transform: none;
+}
+
+.report.is-settled .meter-fill {
+  animation: none;
+  width: var(--fill);
 }
 
 @keyframes meter-weigh {
@@ -1108,20 +1091,19 @@ button.pill {
   to { width: var(--fill); }
 }
 
-@keyframes report-idle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .report.is-on .meter-label,
-  .report.is-settled .meter-label,
-  .report.is-on .meter-edge,
-  .report.is-settled .meter-edge {
+  .report.is-settled .meter-label {
     animation: none;
     opacity: 1;
     transform: none;
-    clip-path: none;
+  }
+
+  .report.is-on .meter-track,
+  .report.is-settled .meter-track {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 
   .meter-fill,
@@ -1129,15 +1111,6 @@ button.pill {
   .report.is-settled .meter-fill {
     animation: none;
     width: var(--fill);
-  }
-
-  .report.is-hold .report-meters { animation: none; }
-
-  .report.is-on .report-send,
-  .report.is-settled .report-send {
-    opacity: 1;
-    transform: translate(-50%, 0);
-    pointer-events: auto;
   }
 }
 

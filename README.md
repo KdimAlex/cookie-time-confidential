@@ -26,5 +26,7 @@ The server uses the Python standard library. No install step.
 | `data/cutaway/` | Gemini trainer reconstruction |
 | `data/archive/` | Reference photos the site can serve |
 | `notes/` | Kiosk storyline, Morehead research, and asset to-dos |
+| `exports/mission-badge.svg` | Completed badge for Figma. Rings are circles, with the thin green outside stroke. |
+| `exports/badge/` | Smaller badge movies (mp4 and webm). The large `.mov` masters stay off GitHub because files over 100MB are rejected. |
 
 `Space Proj.pdf` at the repo root is the project design PDF.

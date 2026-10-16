@@ -440,23 +440,24 @@ function loadLightning() {
     });
 }
 
+/* True only once the crack can start in this turn. A cold first decode
+   used to return here and play later, after the flash had already run. */
 function playLightning() {
   armAudio();
-  if (!audio) return;
+  if (!audio) return false;
   if (!lightningBuffer) {
     if (!lightningBytes) {
       loadLightning();
-      return;
+      return false;
     }
-    if (lightningDecoding) return;
+    if (lightningDecoding) return false;
     lightningDecoding = audio.decodeAudioData(lightningBytes.slice(0)).then((buffer) => {
       lightningBuffer = buffer;
       lightningDecoding = null;
-      playLightning();
     }).catch(() => {
       lightningDecoding = null;
     });
-    return;
+    return false;
   }
   if (lightningSource) {
     try {
@@ -472,11 +473,12 @@ function playLightning() {
   mix.gain.value = 0.75;
   source.connect(mix);
   mix.connect(audio.destination);
-  source.start();
+  source.start(audio.currentTime);
   lightningSource = source;
   source.onended = () => {
     if (lightningSource === source) lightningSource = null;
   };
+  return true;
 }
 
 function playWrong() {
@@ -557,6 +559,8 @@ function startLevel(i) {
       return;
     }
     if (i === 0) {
+      strikeHold = 0;
+      quietParentStorm();
       briefStorm();
       return;
     }
@@ -684,22 +688,48 @@ function beginWatch(i) {
 function introCrashLeft() {
   try {
     if (!window.parent || window.parent === window) return 0;
-    const audio = window.parent.document.getElementById("storm-crash");
-    if (!audio || audio.paused || !Number.isFinite(audio.duration)) return 0;
-    return Math.max(0, audio.duration - audio.currentTime);
+    const clip = window.parent.document.getElementById("storm-crash");
+    if (!clip || clip.paused || !Number.isFinite(clip.duration)) return 0;
+    return Math.max(0, clip.duration - clip.currentTime);
   } catch (err) {
     return 0;
   }
 }
 
+/* The thunderstorm clip starts on the previous screen. Leaving it
+   running put its crack seconds before this round's flash. */
+function quietParentStorm() {
+  try {
+    if (!window.parent || window.parent === window) return;
+    const clip = window.parent.document.getElementById("storm-crash");
+    if (!clip || clip.paused) return;
+    clip.pause();
+  } catch (err) {
+    /* standalone /find has no parent clip */
+  }
+}
+
+let strikeHold = 0;
+
 function beginStrike() {
-  const wait = introCrashLeft();
-  if (wait > 0.05) {
-    later(beginStrike, Math.ceil(wait * 1000) + 40);
+  /* Level 1 is the only round that can still be inside that clip.
+     Waiting it out, then adding 40ms, fired the flash after the crack.
+     Later rounds already strike on the watch timer. */
+  if (index === 0) quietParentStorm();
+  else {
+    const wait = introCrashLeft();
+    if (wait > 0.05) {
+      later(beginStrike, Math.ceil(wait * 1000) + 40);
+      return;
+    }
+  }
+  if (!playLightning() && strikeHold < 6) {
+    strikeHold += 1;
+    later(beginStrike, 40);
     return;
   }
+  strikeHold = 0;
   phase = "strike";
-  playLightning();
   spinRate = 1100;
   spinDrag = 0;
   document.getElementById("star-label")?.remove();
@@ -1316,7 +1346,7 @@ function paintThruster(cmd) {
   if (!thruster || !audio) return;
   const t = audio.currentTime;
   const gain = thruster.mix.gain;
-  const level = amount < 0.02 ? 0.0001 : 1.3 * (0.02 + amount * 0.38);
+  const level = amount < 0.02 ? 0.0001 : 1.69 * (0.02 + amount * 0.38);
   gain.cancelScheduledValues(t);
   gain.setValueAtTime(Math.max(0.0001, gain.value), t);
   gain.setTargetAtTime(level, t, amount < 0.02 ? 0.09 : 0.04);

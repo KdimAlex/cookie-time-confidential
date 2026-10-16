@@ -58,8 +58,6 @@
     let placeTween = null;
     let chain = Promise.resolve();
     let active = null;
-    let printDrop = 0;
-    const PRINT_SLIDE = { duration: 1.05, ease: "power2.inOut" };
 
     stage.classList.add("badge-stage");
     document.body.appendChild(stage);
@@ -105,9 +103,8 @@
     }
 
     /* Large while an achievement plays, then a small sticker in the top-right
-       corner between lessons. The last page uses the same expand, parks large
-       in the left half of the kiosk so the scores can sit on the right, then
-       slides down onto the printer. designate() is the demo's one-shot. */
+       corner between lessons. The designation beat parks large in the left
+       half so a report can sit on the right, then feeds off the bottom. */
     /* The kiosk plate is shorter than the window. Dock inside that frame
        when one is passed; the demo still uses the window. */
     function frameBox() {
@@ -128,38 +125,33 @@
     }
 
     function asideLeft(size) {
-      const vw = document.documentElement.clientWidth || window.innerWidth;
+      const box = frameBox();
+      const vw = box ? box.width : (document.documentElement.clientWidth || window.innerWidth);
+      const origin = box ? box.left : 0;
       const half = vw / 2;
-      if (size + 48 <= half) return (half - size) / 2;
-      return 24;
+      let left = origin + (half - size) / 2;
+      const minLeft = origin + 16;
+      if (left < minLeft || size + 48 > half) left = minLeft;
+      return left;
     }
 
-    /* Large cloth in the left half of the kiosk, centered in the portico
-       above the speech box. The scores occupy the right. */
-    function reportSpot(size) {
+    /* High in the portico, above the speech box, so the meters have the right half. */
+    function asideTop(size) {
       const box = frameBox();
-      if (!box) {
-        const vh = document.documentElement.clientHeight || window.innerHeight;
-        return { left: asideLeft(size), top: Math.max(16, (vh - size) / 2) };
-      }
+      if (!box) return null;
       const terminal = document.getElementById("terminal");
-      let floor = box.top + box.height * (1 - 0.24771);
+      let floor = box.bottom;
       if (terminal && !terminal.hidden) {
         const term = terminal.getBoundingClientRect();
-        if (term.height > 8 && term.top > box.top + size * 0.35) floor = term.top;
+        if (term.height > 8 && term.top > box.top + size * 0.3) floor = term.top;
       }
       const portico = Math.max(size + 8, floor - box.top);
-      const half = box.width * 0.5;
-      let left = box.left + (half - size) / 2;
-      const minLeft = box.left + 16;
-      if (left < minLeft) left = minLeft;
-      /* High in the portico, so the later slide down has room above the speech box. */
-      let top = box.top + Math.max(10, (portico - size) * 0.22);
-      const minTop = box.top + 10;
-      const maxTop = box.top + portico - size - 4;
+      let top = box.top + Math.max(14, (portico - size) * 0.14);
+      const minTop = box.top + 12;
+      const maxTop = box.top + portico - size - 10;
       if (top < minTop) top = minTop;
       if (top > maxTop) top = Math.max(minTop, maxTop);
-      return { left, top };
+      return top;
     }
 
     /* Paint stays at the large size for both poses. Docking used to shrink
@@ -198,31 +190,17 @@
         };
       }
       if (mode === "aside") {
+        const parked = asideTop(size);
         return {
           ...shared,
           position: "fixed",
           right: "auto",
           left: asideLeft(size),
-          top: "50%",
+          top: parked == null ? "50%" : parked,
           x: 0,
           y: 0,
           xPercent: 0,
-          yPercent: -50,
-          scale: 1,
-        };
-      }
-      if (mode === "report") {
-        const spot = reportSpot(size);
-        return {
-          ...shared,
-          position: "fixed",
-          right: "auto",
-          left: spot.left,
-          top: spot.top,
-          x: 0,
-          y: printDrop,
-          xPercent: 0,
-          yPercent: 0,
+          yPercent: parked == null ? -50 : 0,
           scale: 1,
         };
       }
@@ -262,7 +240,6 @@
         present: { duration: 0.85, ease: "power2.inOut" },
         dock: { duration: 1.05, ease: "power2.inOut" },
         aside: { duration: 0.72, ease: "power2.inOut" },
-        report: { duration: 0.72, ease: "power2.inOut" },
         exit: { duration: 1.15, ease: "power1.in" },
       }[mode] || { duration: 0.85, ease: "power2.inOut" };
       const first = place.getBoundingClientRect();
@@ -282,7 +259,7 @@
         scale: destScale * (first.width / Math.max(last.width, 1)),
       }, {
         x: 0,
-        y: next.y || 0,
+        y: 0,
         scale: destScale,
         duration: travel.duration,
         ease: travel.ease,
@@ -407,7 +384,6 @@
 
     function paintPose(spec) {
       const mode = spec.pose || "dock";
-      printDrop = 0;
       hideNeedle();
       writeLine("name", spec.name || "", true);
       writeLine("title", spec.title || "", true);
@@ -712,62 +688,25 @@
         return receive("rank", id);
       },
 
+      /* Left-half park with the marks already seated and the title still blank.
+         Same recall-then-aside move designate uses before it types. */
+      presentAside() {
+        return recall().then(() => enqueue(() => movePlace("aside", true)));
+      },
+
+      /* The print. Same feed off the bottom designate uses after the title. */
+      sendOff() {
+        return enqueue(() => movePlace("exit", true));
+      },
+
       /* 5. Recall, move into the left half, type the designation, then feed
-         off the bottom the way the kiosk prints the cloth.
-         The kiosk print beat uses stagePrint and linger instead, so the
-         meters can weigh in before this arc is named. The kiosk then drops
-         the cloth just far enough to meet the print line. */
+         off the bottom the way the kiosk prints the cloth. */
       designate(text) {
         return recall()
           .then(() => enqueue(() => movePlace("aside", true)))
           .then(() => (text ? this.title(text) : null))
           .then(() => rest(1.2))
           .then(() => enqueue(() => movePlace("exit", true)));
-      },
-
-      /* Final presentation. Same expand as an award, then the large cloth
-         in the left half of the portico. The top arc stays empty. */
-      stagePrint() {
-        printDrop = 0;
-        return recall().then(() => enqueue(() => movePlace("report", true)));
-      },
-
-      /* Slide the parked cloth down to the printer. It stays on the plate. */
-      dropToPrint(dy) {
-        const distance = Number.isFinite(dy) ? dy : 0;
-        printDrop = distance;
-        return enqueue(() => {
-          if (reduce || !distance) {
-            gsap.set(place, { y: distance });
-            return gsap.timeline();
-          }
-          const tl = gsap.timeline();
-          placeTween = tl;
-          tl.to(place, {
-            y: distance,
-            duration: PRINT_SLIDE.duration,
-            ease: PRINT_SLIDE.ease,
-          });
-          return tl;
-        });
-      },
-
-      printSlide: PRINT_SLIDE,
-
-      /* Quiet hold once the designation is in. One slow rise and return. */
-      linger(seconds) {
-        const hold = reduce ? 0 : (seconds == null ? 2.2 : seconds);
-        return enqueue(() => {
-          if (!hold) return gsap.timeline();
-          return gsap.timeline().to(root, {
-            y: -8,
-            scale: 1.012,
-            duration: hold / 2,
-            ease: "sine.inOut",
-            yoyo: true,
-            repeat: 1,
-          });
-        });
       },
 
       /* Preview of the five beats. The corner hold stands in for the lesson
