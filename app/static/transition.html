@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Into the window</title>
+  <link rel="stylesheet" href="/brand.css?v=1">
+  <link rel="stylesheet" href="/transition.css?v=8">
+</head>
+<body>
+  <div id="fit">
+    <div id="stage">
+      <div id="game">
+        <img id="ship" src="/spaceship.svg?v=5" alt="">
+        <svg id="port" viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <clipPath id="port-clip"><circle cx="100" cy="100" r="96"></circle></clipPath>
+          </defs>
+          <circle cx="100" cy="100" r="96" fill="var(--ctc-blue)"></circle>
+          <g id="port-field" clip-path="url(#port-clip)"></g>
+        </svg>
+        <textarea id="console" readonly spellcheck="false"></textarea>
+        <div id="joy">
+          <img src="/joystick.svg?v=2" alt="">
+        </div>
+      </div>
+      <svg id="sky" viewBox="0 0 200 200" aria-hidden="true">
+        <defs>
+          <clipPath id="sky-clip"><circle id="sky-clip-circle" cx="100" cy="100" r="280"></circle></clipPath>
+        </defs>
+        <circle id="sky-disc" cx="100" cy="100" r="280" fill="var(--ctc-blue)"></circle>
+        <g id="sky-field" clip-path="url(#sky-clip)"></g>
+        <circle id="sky-ring" cx="100" cy="100" r="280" fill="none" stroke="var(--ctc-green)"></circle>
+      </svg>
+    </div>
+  </div>
+  <script src="/stars.js?v=1"></script>
+  <script src="/transition.js?v=13"></script>
+</body>
+</html>

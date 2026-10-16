@@ -1,0 +1,101 @@
+/* Cookie Time Confidential — brand sheet
+   Source: Cookie Time Confidential.zip
+   This file is the palette and the frame. Later screens use these tokens.
+
+   TEAL   #09CDE3  Morehead line art. Mode pixel of building.png (Group 12).
+   BLUE   #001135  Space. Mode pixel of the Gemini sky inside File.svg.
+   WHITE  #F8F9EA  Paper, stars, and the suit. File.svg paper fill.
+   BLACK  #0C0C0D  Bubble outer fill. The stage behind it is #000000.
+   GREEN  #42F489  Dialogue, strokes, chevrons, and button type.
+
+   Green family, not extra brand colors:
+     field   #111E15  bubble interior (Asset_SpeechBubble.svg)
+     button  #15261A  pill fill (File.svg)
+
+   Type in the zip is outlined paths, so there is no font-family metadata.
+   These stacks are the roles we draw with:
+     dialogue   SF Mono — bubble text, green
+     grotesque  Avenir Next / Helvetica Neue — file titles, body, instructor
+     badge      Orbitron Black — /badge-kit/font/Orbitron-Black.ttf
+     console    Orbitron — /fonts/orbitron-700.woff2
+
+   Speech bubble, Asset_SpeechBubble.svg, viewBox 0 0 1476 456
+     outer  x 0.5  y 0.5  1475 × 455  rx 119.5  fill #0C0C0D  stroke #42F489
+     inner  x 21.5 y 21.5 1433 × 413  rx 99.5  fill #111E15  stroke #42F489
+     corner radius is 26.2% of the bubble height (119.5 / 456)
+     the black gap between the two green strokes is 4.6% of the height (21 / 456)
+     source stroke width is 1 user unit
+
+   Astronaut, from Artboard 1. Full-resolution art, stood upright.
+     The visor keeps its black rim. He stands on the bubble's outer stroke, at the left.
+     width is 19.4% of the bubble
+
+   Terminal, on the talking screens
+     height is 227 / 667 of the slide, sitting on the bottom edge
+     corner radius is 33% of that height
+     text inset is 6.2% from the left
+
+   Bubble on that same comp
+     green stroke: left 0.5%  top 62.0%  width 98.0%  height 30.2%
+
+   Building plate, 1024 × 667. That image is the canvas.
+     The slide is exactly that ratio. Art stays inside it.
+
+   Chevrons, Group 14.svg, viewBox 0 0 1223 82, fill #42F489
+     left  x 0–50.3     right x 1172.8–1223     height 82
+
+   File card, File.svg, viewBox 0 0 1054 649, paper #F8F9EA
+     art well  x 69  y 86   374 × 280  rx 5
+     button    x 328 y 536  398 × 86   rx 43  fill #15261A  stroke #42F489  3px
+*/
+
+:root {
+  --ctc-teal: #09cde3;
+  --ctc-blue: #001135;
+  --ctc-white: #f8f9ea;
+  --ctc-black: #0c0c0d;
+  --ctc-black-stage: #000000;
+  --ctc-green: #42f489;
+  --ctc-green-field: #111e15;
+  --ctc-green-button: #15261a;
+  --ctc-ink: #111111;
+
+  --ctc-font-dialogue: "SF Mono", ui-monospace, Menlo, monospace;
+  --ctc-font-grotesque: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --ctc-font-badge: "Orbitron", "Orbitron-Bold", sans-serif;
+  --ctc-font-console: "Orbitron", "Orbitron-Bold", sans-serif;
+
+  --ctc-dialogue-size: clamp(16px, 1.65vw, 26px);
+  --ctc-dialogue-leading: 1.45;
+  --ctc-instructor-size: 15px;
+  --ctc-kicker-size: 14px;
+  --ctc-kicker-tracking: 0.18em;
+  --ctc-title-size: clamp(22px, 9cqi, 48px);
+  --ctc-body-size: 15px;
+  --ctc-button-size: 22px;
+  --ctc-button-stroke: 3px;
+
+  --ctc-building-opacity: 1;
+  --ctc-building-ratio: 1024 / 667;
+
+  /* The Morehead plate is the canvas: 1024 × 667.
+     Nothing is placed outside that rectangle.
+     The speech bubble file is 1476 × 455. The template shows its top 243px,
+     and that visible slice sits inside the canvas, on the bottom edge. */
+  --ctc-bubble-left: 1.158%;
+  --ctc-bubble-right: 1.158%;
+  --ctc-bubble-bottom: 0;
+  --ctc-bubble-min-height: 24.771cqh;
+  --ctc-bubble-art-height: 187.24%;
+  --ctc-bubble-pad-x: 7.3%;
+  --ctc-bubble-pad-top: 9.68cqh;
+  --ctc-bubble-pad-bottom: 0;
+  --ctc-astronaut-left: 0.2%;
+  --ctc-astronaut-width: 17%;
+  --ctc-astronaut-overlap: 44%;
+
+  --ctc-who-right: 36px;
+
+  --ctc-art-ratio: 374 / 280;
+  --ctc-file-radius: 18px;
+}

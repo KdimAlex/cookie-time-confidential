@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Constellation Run</title>
+  <style>
+    html, body { margin: 0; min-height: 100%; background: #031133; }
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    #game { width: min(100vw, calc(100vh * 16 / 9)); }
+    @media (max-width: 619px) { #game { width: min(100vw, calc(100vh * 3 / 5)); } }
+  </style>
+</head>
+<body>
+  <div id="game" data-constellation-run></div>
+  <script src="/vendor/constellation-run/constellation-run.js?v=5"></script>
+  <script>
+    const root = document.getElementById("game");
+    const api = window.ConstellationRun.mount(root);
+    if (window.parent !== window) api.start();
+    let sent = false;
+    let decidedAt = 0;
+    /* Last gate only. A short beat keeps the hit or miss on screen,
+       then the kiosk fades in. Waiting for the empty "over" sky
+       left the run sitting on a blank frame. */
+    const BEAT = 420;
+    function roundSettled(snap) {
+      const results = snap.results || [];
+      if (!results.length || results.some((result) => result === "pending")) return false;
+      if (snap.state === "over") return true;
+      return snap.level === results.length - 1 && snap.phase === "after";
+    }
+    function watch() {
+      if (!api || sent) return;
+      const snap = api.getState();
+      if (roundSettled(snap)) {
+        if (!decidedAt) decidedAt = performance.now();
+        if (performance.now() - decidedAt >= BEAT) {
+          sent = true;
+          const marks = (snap.results || []).map((result) => ({ right: result === "hit" }));
+          parent.postMessage({ source: "morehead-game", game: "ident", marks }, location.origin);
+          return;
+        }
+      }
+      requestAnimationFrame(watch);
+    }
+    requestAnimationFrame(watch);
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 667" preserveAspectRatio="none">
+  <defs>
+    <radialGradient id="sky" cx="15%" cy="0%" r="120%">
+      <stop offset="0%" stop-color="#02091D"/>
+      <stop offset="55%" stop-color="#031133"/>
+      <stop offset="100%" stop-color="#031338"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="667" fill="url(#sky)"/>
+</svg>

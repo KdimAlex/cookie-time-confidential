@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Morehead</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/vendor/peel.css" />
+</head>
+<body class="journey">
+  <div class="rail" id="rail"></div>
+  <div class="scrolly" id="scrolly">
+    <div class="stage" id="stage">
+      <div class="sky-frame" id="sky-frame">
+        <canvas id="dome"></canvas>
+      </div>
+      <div class="veil" id="veil"></div>
+      <div class="mask" id="mask"></div>
+      <figure class="still" id="still" hidden>
+        <img src="/archive/training-morehead.jpg" alt="Edward White and James McDivitt in the Morehead trainer, the Zeiss projector above them, 7 May 1965">
+        <figcaption>
+          <span>7 May 1965</span>
+          <strong>White and McDivitt</strong>
+          <em>Morehead. The Zeiss above the plywood.</em>
+        </figcaption>
+      </figure>
+      <div class="objects" id="objects"></div>
+      <div class="copy" id="copy"></div>
+      <div class="reticule" id="reticule" hidden></div>
+      <div class="disc-wrap" id="disc-wrap" hidden>
+        <div id="disc"></div>
+      </div>
+      <div class="plate" id="plate" hidden></div>
+      <div class="sheet-scene" id="sheet-scene">
+        <div class="sheet">
+          <div id="peel">
+            <div class="peel-top" id="peel-face"></div>
+            <div class="peel-back"></div>
+            <div class="peel-bottom"></div>
+          </div>
+        </div>
+        <p class="role-caption" id="role-caption"></p>
+        <p class="receipt" id="receipt"></p>
+      </div>
+      <p class="hint" id="hint">Scroll</p>
+    </div>
+    <div class="steps" id="steps"></div>
+  </div>
+  <script src="/vendor/scrollama.js"></script>
+  <script src="/vendor/peel.js"></script>
+  <script src="/patch.js"></script>
+  <script src="/journey.js"></script>
+</body>
+</html>

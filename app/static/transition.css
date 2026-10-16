@@ -1,0 +1,121 @@
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--ctc-black-stage);
+  overflow: hidden;
+}
+
+@font-face {
+  font-family: "Orbitron";
+  src: url("/fonts/orbitron-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
+#fit {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  flex: none;
+  background: #151515;
+  /* The wide disc is already drawn past this frame. Let it cover the
+     letterbox. #fit still clips to the viewport, so the frame — and the
+     porthole the next game is registered to — does not move. */
+  overflow: visible;
+  transform-origin: center center;
+}
+
+body.is-flat,
+body.is-flat #fit {
+  width: 1920px;
+  height: 1080px;
+  background: #151515;
+}
+
+body.is-flat #stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#sky,
+#port {
+  position: absolute;
+  display: block;
+}
+
+#port {
+  overflow: hidden;
+}
+
+#sky {
+  z-index: 8;
+  overflow: visible;
+  transform-origin: center center;
+}
+
+#game {
+  position: absolute;
+  inset: 0;
+}
+
+#ship {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+#console {
+  position: absolute;
+  z-index: 3;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ctc-green);
+  font-family: var(--ctc-font-console);
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.2;
+  letter-spacing: 0;
+  resize: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#joy {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 0;
+  width: 340px;
+  height: 136px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+#joy img {
+  position: absolute;
+  left: 50%;
+  bottom: -42px;
+  width: 179px;
+  height: 179px;
+  margin-left: -86px;
+  transform-origin: 47.8% 97%;
+}

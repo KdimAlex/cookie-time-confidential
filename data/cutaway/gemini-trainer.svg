@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1040" width="1280" height="1040">
+  <title>Morehead Star Theater, training section (reconstruction)</title>
+  <desc>Schematic section of the Morehead dome with a Zeiss dumbbell and the Gemini trainer. Reconstruction from published descriptions, not a shop drawing.</desc>
+  <style>
+    text { font-family: ui-sans-serif, system-ui, sans-serif; fill: #1c1917; }
+    .ink { fill: none; stroke: #1c1917; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+    .thin { fill: none; stroke: #1c1917; stroke-width: 1; }
+    .hair { fill: none; stroke: #78716c; stroke-width: 1; }
+    .dash { fill: none; stroke: #9a3412; stroke-width: 1.4; stroke-dasharray: 5 4; }
+    .fill-paper { fill: #faf7f2; }
+    .fill-sphere { fill: #f3efe6; }
+    .fill-box { fill: #e7e0d4; }
+    .num { font-size: 11px; font-weight: 650; }
+    .label { font-size: 12px; }
+    .small { font-size: 11px; fill: #44403c; }
+    .title { font-size: 20px; font-weight: 650; }
+    .kicker { font-size: 11px; letter-spacing: 0.12em; fill: #57534e; }
+  </style>
+  <rect width="1280" height="1040" fill="#faf7f2"/>
+
+  <text class="kicker" x="48" y="36">VDC 2026 · MOREHEAD PLANETARIUM · RECONSTRUCTION</text>
+  <text class="title" x="48" y="64">Training section  —  Zeiss dumbbell and Gemini trainer</text>
+  <text class="small" x="48" y="86">Schematic. Not to scale. The astronaut sees a window-sized patch of the dome, not the Chapel Hill horizon.</text>
+
+  <!-- dome -->
+  <g id="dome">
+    <path class="ink" d="M140 600 A300 300 0 0 1 740 600"/>
+    <line class="ink" x1="140" y1="600" x2="140" y2="690"/>
+    <line class="ink" x1="740" y1="600" x2="740" y2="690"/>
+    <line class="ink" x1="100" y1="690" x2="800" y2="690"/>
+    <text class="small" x="150" y="582">spring line</text>
+    <text class="small" x="752" y="650">cove</text>
+    <text class="small" x="430" y="250">68 ft diameter</text>
+    <text class="small" x="430" y="266">44 ft floor to apex</text>
+  </g>
+
+  <!-- zeiss dumbbell, center of motion near the sphere center -->
+  <g id="zeiss">
+    <line class="thin" x1="400" y1="560" x2="400" y2="690"/>
+    <line class="thin" x1="480" y1="560" x2="480" y2="690"/>
+    <line class="thin" x1="360" y1="690" x2="520" y2="690"/>
+    <path class="hair" d="M370 640 L440 575 L510 640"/>
+    <ellipse class="ink fill-sphere" cx="360" cy="545" rx="48" ry="48"/>
+    <ellipse class="ink fill-sphere" cx="520" cy="545" rx="48" ry="48"/>
+    <rect class="ink fill-sphere" x="392" y="522" width="96" height="46"/>
+    <!-- plate holes, suggestive, not a real plate -->
+    <g class="hair" stroke-width="1.2">
+      <circle cx="344" cy="530" r="1.2" fill="#1c1917" stroke="none"/>
+      <circle cx="356" cy="522" r="2" fill="#1c1917" stroke="none"/>
+      <circle cx="370" cy="536" r="1.4" fill="#1c1917" stroke="none"/>
+      <circle cx="338" cy="552" r="1" fill="#1c1917" stroke="none"/>
+      <circle cx="366" cy="558" r="1.6" fill="#1c1917" stroke="none"/>
+      <circle cx="504" cy="528" r="1.2" fill="#1c1917" stroke="none"/>
+      <circle cx="518" cy="518" r="2" fill="#1c1917" stroke="none"/>
+      <circle cx="534" cy="536" r="1.3" fill="#1c1917" stroke="none"/>
+      <circle cx="512" cy="556" r="1" fill="#1c1917" stroke="none"/>
+      <circle cx="536" cy="558" r="1.7" fill="#1c1917" stroke="none"/>
+    </g>
+    <!-- lamp dots -->
+    <circle cx="360" cy="545" r="4" fill="#1c1917"/>
+    <circle cx="520" cy="545" r="4" fill="#1c1917"/>
+    <!-- long axis -->
+    <line class="thin" x1="312" y1="545" x2="568" y2="545"/>
+    <!-- latitude arrow -->
+    <path class="thin" d="M250 500 A 70 70 0 0 1 300 430"/>
+    <path class="ink" d="M292 438 L300 430 L306 442"/>
+    <!-- daily rotation arrow on north sphere -->
+    <path class="thin" d="M548 510 A 22 22 0 1 1 548 580"/>
+    <path class="ink" d="M544 572 L548 582 L556 574"/>
+  </g>
+
+  <!-- gemini trainer -->
+  <g id="trainer">
+    <ellipse class="ink fill-box" cx="640" cy="668" rx="28" ry="10"/>
+    <rect class="ink fill-box" x="628" y="630" width="24" height="38"/>
+    <ellipse class="ink fill-box" cx="720" cy="668" rx="28" ry="10"/>
+    <rect class="ink fill-box" x="708" y="630" width="24" height="38"/>
+    <path class="ink fill-box" d="M600 630 L770 614 L784 560 L612 532 Z"/>
+    <path class="ink" d="M632 548 L700 542 L706 572 L636 580 Z"/>
+    <!-- sightline clears the dumbbell -->
+    <line class="dash" x1="636" y1="556" x2="318" y2="312"/>
+    <circle class="dash" cx="318" cy="312" r="18"/>
+  </g>
+
+  <!-- callout indices -->
+  <g class="num">
+    <g id="c1"><circle class="ink fill-paper" cx="560" cy="500" r="9"/><text x="560" y="504" text-anchor="middle">1</text></g>
+    <g id="c2"><circle class="ink fill-paper" cx="320" cy="500" r="9"/><text x="320" y="504" text-anchor="middle">2</text></g>
+    <g id="c3"><circle class="ink fill-paper" cx="440" cy="508" r="9"/><text x="440" y="512" text-anchor="middle">3</text></g>
+    <g id="c4"><circle class="ink fill-paper" cx="300" cy="560" r="9"/><text x="300" y="564" text-anchor="middle">4</text></g>
+    <g id="c5"><circle class="ink fill-paper" cx="560" cy="610" r="9"/><text x="560" y="614" text-anchor="middle">5</text></g>
+    <g id="c6"><circle class="ink fill-paper" cx="268" cy="470" r="9"/><text x="268" y="474" text-anchor="middle">6</text></g>
+    <g id="c7"><circle class="ink fill-paper" cx="575" cy="545" r="9"/><text x="575" y="549" text-anchor="middle">7</text></g>
+    <g id="c8"><circle class="ink fill-paper" cx="300" cy="530" r="9"/><text x="300" y="534" text-anchor="middle">8</text></g>
+    <g id="c9"><circle class="ink fill-paper" cx="200" cy="590" r="9"/><text x="200" y="594" text-anchor="middle">9</text></g>
+    <g id="c10"><circle class="ink fill-paper" cx="760" cy="590" r="9"/><text x="760" y="594" text-anchor="middle">10</text></g>
+    <g id="c11"><circle class="ink fill-paper" cx="668" cy="530" r="9"/><text x="668" y="534" text-anchor="middle">11</text></g>
+    <g id="c12"><circle class="ink fill-paper" cx="680" cy="700" r="9"/><text x="680" y="704" text-anchor="middle">12</text></g>
+    <g id="c13"><circle class="ink fill-paper" cx="790" cy="560" r="9"/><text x="790" y="564" text-anchor="middle">13</text></g>
+    <g id="c14"><circle class="ink fill-paper" cx="318" cy="280" r="9"/><text x="318" y="284" text-anchor="middle">14</text></g>
+  </g>
+
+  <!-- legend -->
+  <line class="hair" x1="48" y1="740" x2="1232" y2="740"/>
+  <text class="label" x="48" y="768" font-weight="650">Zeiss, Model II class anatomy</text>
+  <text class="small" x="48" y="790">1 Northern star sphere</text>
+  <text class="small" x="48" y="808">2 Southern star sphere</text>
+  <text class="small" x="48" y="826">3 Central cage: Sun, Moon, planets</text>
+  <text class="small" x="48" y="844">4 Perforated plates. Many hole sizes stand for magnitude.</text>
+  <text class="small" x="48" y="862">5 Lamp in each sphere. 1,000 W on the II. 1,200 W on the VI.</text>
+  <text class="small" x="48" y="880">6 Latitude axis. Parks on Chapel Hill for a public show. Moves off it for a flight path.</text>
+  <text class="small" x="48" y="898">7 Daily rotation.</text>
+  <text class="small" x="48" y="916">8 Precession, along the long axis of the dumbbell.</text>
+  <text class="small" x="48" y="934">9 Horizon shutters on the lenses. They are not a second star catalog.</text>
+
+  <text class="label" x="560" y="768" font-weight="650">Gemini trainer</text>
+  <text class="small" x="560" y="790">10 Plywood box. Cloth, foam rubber, and paper.</text>
+  <text class="small" x="560" y="808">11 Opening cut to the spacecraft window. Size not measured here.</text>
+  <text class="small" x="560" y="826">12 Two barber chairs. A technician turns them for yaw.</text>
+  <text class="small" x="560" y="844">13 Hand control. Pitch and roll come from moving the star field, not the chair.</text>
+  <text class="small" x="560" y="862">14 Dashed sightline. The patch is about 60°, McColman's summary, not a window drawing.</text>
+  <text class="small" x="560" y="892">Chair count follows Morehead's history page. A later UNC account says one swiveling base.</text>
+  <text class="small" x="560" y="910">Sphere diameters and plate details are Model II class figures (Zeiss, and the Buhl instrument),</text>
+  <text class="small" x="560" y="928">not caliper readings from the Göteborg machine that stood in this pit.</text>
+
+  <text class="label" x="48" y="978" font-weight="650">Other programs, not drawn</text>
+  <text class="small" x="48" y="998">Mercury: a modified Link trainer, with a fighter-pilot canopy over the astronaut's head.</text>
+  <text class="small" x="48" y="1016">Apollo: an optical device in place of the window holes, plus orbital-line projectors. One of those projectors was built from car-wax cans and miniature bulbs.</text>
+</svg>

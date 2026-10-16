@@ -1,0 +1,54 @@
+{
+  "name": "Morehead Star Theater",
+  "institution": "Morehead Planetarium and Science Center",
+  "campus": "University of North Carolina at Chapel Hill",
+  "address": "250 East Franklin Street, Chapel Hill, NC 27599",
+  "sexagesimal": {
+    "latitude": "35°54'49\" N",
+    "longitude": "79°03'02\" W"
+  },
+  "lat_deg": 35.913611,
+  "lon_deg": -79.050556,
+  "alt_m": 144,
+  "coordinate_source": "Worldwide Planetariums Database sheet for this theater. Altitude printed there as 144 m; an earlier sheet of the same database printed 145 m.",
+  "dome": {
+    "diameter_m": 20.7,
+    "diameter_ft": 68,
+    "height_ft": 44,
+    "height_note": "Floor to apex, as published by Morehead for the fulldome theater. A 68 ft diameter hemisphere would rise 34 ft, so the extra height is the cove under the spring line, not a deeper sphere.",
+    "seats_1949": 330,
+    "seats_after_renovation": 229
+  },
+  "projectors": [
+    {
+      "model": "Zeiss Model II",
+      "from": "1949-05-10",
+      "to": "1969-03-19",
+      "stars": 8900,
+      "magnitude_limit": 6.5,
+      "lamps_w": 1000,
+      "notes": "Bought in Sweden. Stockholm exhibition instrument of 1930, stored in Stockholm, then Göteborg, installed for the 10 May 1949 opening. Planetarium-database history calls a 1959 servicing an upgrade toward Model III. RocketSTEM describes that work as a correction of the 42 brightest stars. Mercury and Gemini training used this machine."
+    },
+    {
+      "model": "Zeiss Model VI",
+      "from": "1969-03-19",
+      "to": "2011-04",
+      "stars": 8900,
+      "lamps_w": 1200,
+      "notes": "One of nine Model VI instruments. Clearer field, eclipse devices, redesigned console. Neil Armstrong was the first astronaut to train on it. Decommissioned April 2011; removed by August 2011."
+    },
+    {
+      "model": "Digital fulldome",
+      "from": "2010",
+      "to": null,
+      "notes": "GlaxoSmithKline Fulldome Theater. Sky-Skan Definiti, later a 4K edge-blended pair (north half and south half). The training-era view is a reconstruction. The Zeiss is not in the pit."
+    }
+  ],
+  "projection": {
+    "geometry": "Hemisphere centered on the instrument, near the center of the dome sphere. Horizon is a diaphragm of shutters on the star-sphere lenses, not a second catalog.",
+    "magnitude_cutoff": 6.5,
+    "why_6_5": "Matches the published Zeiss plate limit of about 8,900 stars. A modern digital catalog goes much fainter and would not be the training sky.",
+    "plate_stand_in": "Yale Bright Star Catalog or Hipparcos, stars brighter than magnitude 6.5. The perforated plates themselves are not reproduced in this folder.",
+    "training_view_is_not_the_local_horizon": "Instructors drove daily motion and the latitude axis so stars sat where a spacecraft window would see them. Chapel Hill's latitude is the public-show default, not the astronaut view."
+  }
+}

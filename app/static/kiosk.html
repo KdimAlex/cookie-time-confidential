@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cookie Time Confidential</title>
+  <link rel="stylesheet" href="/brand.css?v=8">
+  <link rel="stylesheet" href="/kiosk.css?v=92">
+  <link rel="stylesheet" href="/badge-kit/badge.css?v=4">
+</head>
+<body>
+  <header id="critique">
+    <button type="button" id="back">Back</button>
+    <p id="where"><b id="count"></b><span id="label"></span><i id="live" hidden>Live</i></p>
+    <button type="button" id="leave" hidden>Continue the flow</button>
+    <button type="button" id="next">Next</button>
+  </header>
+  <main id="kiosk">
+    <img id="world" src="/kiosk/art/building.png?v=2" alt="">
+    <img id="sky" src="/kiosk/art/star-sky.svg?v=1" alt="">
+    <div id="cast" aria-hidden="true">
+      <img src="/kiosk/art/astronaut.png?v=4" alt="">
+    </div>
+    <div id="plate"></div>
+    <iframe id="slot" title="Training piece" hidden></iframe>
+    <form id="name-box" hidden>
+      <label>
+        <input id="name" name="name" maxlength="22" autocomplete="off" spellcheck="false" placeholder="Insert name here" aria-label="Your name">
+      </label>
+    </form>
+    <div id="terminal" hidden>
+      <span id="who">Instructor</span>
+      <p id="line"></p>
+    </div>
+    <div id="storm-flash" aria-hidden="true"></div>
+  </main>
+  <audio id="storm-crash" preload="auto" src="/lightning.mp3"></audio>
+  <div id="badge"></div>
+  <div id="bed-host" aria-hidden="true"><div id="bed"></div></div>
+  <script src="/badge-kit/vendor/gsap.min.js"></script>
+  <script src="/badge-kit/classify.js"></script>
+  <script src="/badge-kit/player.js?v=17"></script>
+  <link rel="preload" as="image" href="/kiosk/art/starnav.png?v=1">
+  <link rel="preload" as="image" href="/kiosk/art/triangle-sky.svg?v=1">
+  <script src="/vendor/guiding-stars.js?v=4"></script>
+  <script src="/vendor/star-navigation.js?v=5"></script>
+  <script src="/kiosk.js?v=87"></script>
+</body>
+</html>

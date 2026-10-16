@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guiding Stars</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: transparent; }
+    body { display: flex; align-items: center; justify-content: center; }
+    #anim { width: min(640px, 94vw); }
+  </style>
+</head>
+<body>
+  <div id="anim" data-guiding-stars></div>
+  <script src="/vendor/guiding-stars.js?v=3"></script>
+  <script>
+    const root = document.getElementById("anim");
+    let prev = 0;
+    let sent = false;
+    function watch() {
+      const api = root.__guidingStars;
+      if (!api || sent) return;
+      const t = api.getState().t;
+      if (prev > 15 && t < 1) {
+        sent = true;
+        api.pause();
+        parent.postMessage({ source: "morehead-game", game: "guiding" }, location.origin);
+        return;
+      }
+      prev = t;
+      requestAnimationFrame(watch);
+    }
+    requestAnimationFrame(watch);
+  </script>
+</body>
+</html>

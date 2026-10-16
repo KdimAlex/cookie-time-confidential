@@ -1,0 +1,1030 @@
+{
+  "catalog": "Apollo guide stars",
+  "count": 37,
+  "source": {
+    "vectors": "Colossus 249 STAR_TABLES.agc, assembled 28 October 1968. Public domain. Virtual AGC transcription.",
+    "vectors_url": "https://github.com/virtualagc/virtualagc/blob/master/Colossus249/STAR_TABLES.agc",
+    "names_and_magnitudes": "Luminary 209 reference card, stab/planet list dated 1 January 1971. GE Apollo Systems, Houston.",
+    "names_url": "https://www.ibiblio.org/apollo/Documents/islgc_reference_cards_lmy209.pdf",
+    "frame": "AGC basic reference: X toward the vernal equinox, Z toward the north celestial pole, Y completing a right-handed set. Comments in the source number the stars in decimal order 1 through 37; the octal field is that index printed in octal, which is the code the crew keyed.",
+    "epoch_note": "These are the flight-computer components, not a J2000 catalog. Precession to a 2026 planetarium night is a separate step."
+  },
+  "memorial_names": {
+    "who": "Anthony Jenzano, Morehead director, put three names onto the NASA list. Gus Grissom had coined them in 1966 from the Apollo 1 crew.",
+    "stars": [
+      "Navi",
+      "Regor",
+      "Dnoces"
+    ]
+  },
+  "named_sightings": [
+    {
+      "mission": "Apollo 13",
+      "stars": [
+        "Altair",
+        "Vega"
+      ],
+      "when": "After debris cleared, hours before reentry."
+    },
+    {
+      "mission": "Apollo 13",
+      "stars": [
+        "Antares",
+        "Nunki"
+      ],
+      "when": "Flying into the shadow of the Moon."
+    }
+  ],
+  "missions_without_a_named_pair": [
+    "Faith 7 (Mercury-Atlas 9): Gordon Cooper held a 34 degree reentry attitude by the stars. Sources do not name the pair.",
+    "Apollo 12: after lightning, the crew realigned by sighting key stars. Sources used here do not name them."
+  ],
+  "stars": [
+    {
+      "octal": "1",
+      "decimal_index": 1,
+      "name": "Alpheratz",
+      "bayer": "\u03b1 Andromedae",
+      "constellation": "Andromeda",
+      "visual_magnitude": 2.1,
+      "agc_xyz": [
+        0.8749183324,
+        0.025891699,
+        0.4835778442
+      ],
+      "ra_deg": 1.6951,
+      "dec_deg": 28.9193,
+      "ra_hms": {
+        "hours": 0,
+        "minutes": 6,
+        "seconds": 46.8
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 28,
+        "minutes": 55,
+        "seconds": 9.6
+      }
+    },
+    {
+      "octal": "2",
+      "decimal_index": 2,
+      "name": "Diphda",
+      "bayer": "\u03b2 Ceti",
+      "constellation": "Cetus",
+      "visual_magnitude": 2.2,
+      "agc_xyz": [
+        0.9342726691,
+        0.1732973829,
+        -0.3116128956
+      ],
+      "ra_deg": 10.5083,
+      "dec_deg": -18.1565,
+      "ra_hms": {
+        "hours": 0,
+        "minutes": 42,
+        "seconds": 2.0
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 18,
+        "minutes": 9,
+        "seconds": 23.2
+      }
+    },
+    {
+      "octal": "3",
+      "decimal_index": 3,
+      "name": "Navi",
+      "bayer": "\u03b3 Cassiopeiae",
+      "constellation": "Cassiopeia",
+      "visual_magnitude": null,
+      "agc_xyz": [
+        0.477674628,
+        0.1164935557,
+        0.8707790771
+      ],
+      "ra_deg": 13.7056,
+      "dec_deg": 60.5493,
+      "ra_hms": {
+        "hours": 0,
+        "minutes": 54,
+        "seconds": 49.3
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 60,
+        "minutes": 32,
+        "seconds": 57.5
+      },
+      "note": "Virgil Ivan Grissom, spelled backward. Gamma Cassiopeiae is variable; the Luminary 209 card prints VAR."
+    },
+    {
+      "octal": "4",
+      "decimal_index": 4,
+      "name": "Achernar",
+      "bayer": "\u03b1 Eridani",
+      "constellation": "Eridanus",
+      "visual_magnitude": 0.6,
+      "agc_xyz": [
+        0.4917355618,
+        0.2203784481,
+        -0.8423950835
+      ],
+      "ra_deg": 24.1402,
+      "dec_deg": -57.3939,
+      "ra_hms": {
+        "hours": 1,
+        "minutes": 36,
+        "seconds": 33.7
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 57,
+        "minutes": 23,
+        "seconds": 38.1
+      }
+    },
+    {
+      "octal": "5",
+      "decimal_index": 5,
+      "name": "Polaris",
+      "bayer": "\u03b1 Ursae Minoris",
+      "constellation": "Ursa Minor",
+      "visual_magnitude": 2.1,
+      "agc_xyz": [
+        0.0131955837,
+        0.0078043793,
+        0.9998824772
+      ],
+      "ra_deg": 30.6017,
+      "dec_deg": 89.1216,
+      "ra_hms": {
+        "hours": 2,
+        "minutes": 2,
+        "seconds": 24.4
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 89,
+        "minutes": 7,
+        "seconds": 17.7
+      }
+    },
+    {
+      "octal": "6",
+      "decimal_index": 6,
+      "name": "Acamar",
+      "bayer": "\u03b8 Eridani",
+      "constellation": "Eridanus",
+      "visual_magnitude": 3.4,
+      "agc_xyz": [
+        0.5450662811,
+        0.5313738486,
+        -0.6484940879
+      ],
+      "ra_deg": 44.2712,
+      "dec_deg": -40.4282,
+      "ra_hms": {
+        "hours": 2,
+        "minutes": 57,
+        "seconds": 5.1
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 40,
+        "minutes": 25,
+        "seconds": 41.4
+      }
+    },
+    {
+      "octal": "7",
+      "decimal_index": 7,
+      "name": "Menkar",
+      "bayer": "\u03b1 Ceti",
+      "constellation": "Cetus",
+      "visual_magnitude": 2.8,
+      "agc_xyz": [
+        0.7033883645,
+        0.7074274193,
+        0.0692188921
+      ],
+      "ra_deg": 45.164,
+      "dec_deg": 3.9691,
+      "ra_hms": {
+        "hours": 3,
+        "minutes": 0,
+        "seconds": 39.4
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 3,
+        "minutes": 58,
+        "seconds": 8.8
+      }
+    },
+    {
+      "octal": "10",
+      "decimal_index": 8,
+      "name": "Mirfak",
+      "bayer": "\u03b1 Persei",
+      "constellation": "Perseus",
+      "visual_magnitude": 1.9,
+      "agc_xyz": [
+        0.4107492871,
+        0.498719061,
+        0.7632590132
+      ],
+      "ra_deg": 50.5248,
+      "dec_deg": 49.7524,
+      "ra_hms": {
+        "hours": 3,
+        "minutes": 22,
+        "seconds": 6.0
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 49,
+        "minutes": 45,
+        "seconds": 8.5
+      }
+    },
+    {
+      "octal": "11",
+      "decimal_index": 9,
+      "name": "Aldebaran",
+      "bayer": "\u03b1 Tauri",
+      "constellation": "Taurus",
+      "visual_magnitude": 1.1,
+      "agc_xyz": [
+        0.3509587451,
+        0.8925545449,
+        0.2831507435
+      ],
+      "ra_deg": 68.5349,
+      "dec_deg": 16.4483,
+      "ra_hms": {
+        "hours": 4,
+        "minutes": 34,
+        "seconds": 8.4
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 16,
+        "minutes": 26,
+        "seconds": 54.0
+      }
+    },
+    {
+      "octal": "12",
+      "decimal_index": 10,
+      "name": "Rigel",
+      "bayer": "\u03b2 Orionis",
+      "constellation": "Orion",
+      "visual_magnitude": 0.3,
+      "agc_xyz": [
+        0.2013426456,
+        0.9689888101,
+        -0.1432544058
+      ],
+      "ra_deg": 78.2618,
+      "dec_deg": -8.2362,
+      "ra_hms": {
+        "hours": 5,
+        "minutes": 13,
+        "seconds": 2.8
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 8,
+        "minutes": 14,
+        "seconds": 10.4
+      }
+    },
+    {
+      "octal": "13",
+      "decimal_index": 11,
+      "name": "Capella",
+      "bayer": "\u03b1 Aurigae",
+      "constellation": "Auriga",
+      "visual_magnitude": 0.2,
+      "agc_xyz": [
+        0.1373948084,
+        0.6813398852,
+        0.7189566241
+      ],
+      "ra_deg": 78.599,
+      "dec_deg": 45.9684,
+      "ra_hms": {
+        "hours": 5,
+        "minutes": 14,
+        "seconds": 23.8
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 45,
+        "minutes": 58,
+        "seconds": 6.3
+      }
+    },
+    {
+      "octal": "14",
+      "decimal_index": 12,
+      "name": "Canopus",
+      "bayer": "\u03b1 Carinae",
+      "constellation": "Carina",
+      "visual_magnitude": -0.9,
+      "agc_xyz": [
+        -0.0614360769,
+        0.6031700106,
+        -0.7952430739
+      ],
+      "ra_deg": 95.8158,
+      "dec_deg": -52.6782,
+      "ra_hms": {
+        "hours": 6,
+        "minutes": 23,
+        "seconds": 15.8
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 52,
+        "minutes": 40,
+        "seconds": 41.6
+      }
+    },
+    {
+      "octal": "15",
+      "decimal_index": 13,
+      "name": "Sirius",
+      "bayer": "\u03b1 Canis Majoris",
+      "constellation": "Canis Major",
+      "visual_magnitude": -1.6,
+      "agc_xyz": [
+        -0.1818957154,
+        0.9405318128,
+        -0.2869039173
+      ],
+      "ra_deg": 100.9457,
+      "dec_deg": -16.6727,
+      "ra_hms": {
+        "hours": 6,
+        "minutes": 43,
+        "seconds": 47.0
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 16,
+        "minutes": 40,
+        "seconds": 21.7
+      }
+    },
+    {
+      "octal": "16",
+      "decimal_index": 14,
+      "name": "Procyon",
+      "bayer": "\u03b1 Canis Minoris",
+      "constellation": "Canis Minor",
+      "visual_magnitude": 0.5,
+      "agc_xyz": [
+        -0.4116502629,
+        0.9066387314,
+        0.0924676785
+      ],
+      "ra_deg": 114.4199,
+      "dec_deg": 5.3056,
+      "ra_hms": {
+        "hours": 7,
+        "minutes": 37,
+        "seconds": 40.8
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 5,
+        "minutes": 18,
+        "seconds": 20.1
+      }
+    },
+    {
+      "octal": "17",
+      "decimal_index": 15,
+      "name": "Regor",
+      "bayer": "\u03b3 Velorum",
+      "constellation": "Vela",
+      "visual_magnitude": 1.9,
+      "agc_xyz": [
+        -0.3611937602,
+        0.574807784,
+        -0.7342581827
+      ],
+      "ra_deg": 122.1442,
+      "dec_deg": -47.2446,
+      "ra_hms": {
+        "hours": 8,
+        "minutes": 8,
+        "seconds": 34.6
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 47,
+        "minutes": 14,
+        "seconds": 40.5
+      },
+      "note": "Roger Chaffee, spelled backward. Bayer designation is Gamma Velorum, not Sigma Puppis."
+    },
+    {
+      "octal": "20",
+      "decimal_index": 16,
+      "name": "Dnoces",
+      "bayer": "\u03b9 Ursae Majoris",
+      "constellation": "Ursa Major",
+      "visual_magnitude": 3.1,
+      "agc_xyz": [
+        -0.4656165921,
+        0.4775804724,
+        0.7450624681
+      ],
+      "ra_deg": 134.2733,
+      "dec_deg": 48.1645,
+      "ra_hms": {
+        "hours": 8,
+        "minutes": 57,
+        "seconds": 5.6
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 48,
+        "minutes": 9,
+        "seconds": 52.1
+      },
+      "note": "Edward H. White II. Dnoces is Second backward."
+    },
+    {
+      "octal": "21",
+      "decimal_index": 17,
+      "name": "Alphard",
+      "bayer": "\u03b1 Hydrae",
+      "constellation": "Hydra",
+      "visual_magnitude": 2.2,
+      "agc_xyz": [
+        -0.7741360248,
+        0.6154234025,
+        -0.1482142053
+      ],
+      "ra_deg": 141.516,
+      "dec_deg": -8.5235,
+      "ra_hms": {
+        "hours": 9,
+        "minutes": 26,
+        "seconds": 3.8
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 8,
+        "minutes": 31,
+        "seconds": 24.4
+      }
+    },
+    {
+      "octal": "22",
+      "decimal_index": 18,
+      "name": "Regulus",
+      "bayer": "\u03b1 Leonis",
+      "constellation": "Leo",
+      "visual_magnitude": 1.3,
+      "agc_xyz": [
+        -0.8606970465,
+        0.4638127405,
+        0.2099484122
+      ],
+      "ra_deg": 151.6806,
+      "dec_deg": 12.1193,
+      "ra_hms": {
+        "hours": 10,
+        "minutes": 6,
+        "seconds": 43.4
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 12,
+        "minutes": 7,
+        "seconds": 9.6
+      }
+    },
+    {
+      "octal": "23",
+      "decimal_index": 19,
+      "name": "Denebola",
+      "bayer": "\u03b2 Leonis",
+      "constellation": "Leo",
+      "visual_magnitude": 2.2,
+      "agc_xyz": [
+        -0.965624024,
+        0.0528067543,
+        0.2545224762
+      ],
+      "ra_deg": 176.8698,
+      "dec_deg": 14.7453,
+      "ra_hms": {
+        "hours": 11,
+        "minutes": 47,
+        "seconds": 28.8
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 14,
+        "minutes": 44,
+        "seconds": 43.0
+      }
+    },
+    {
+      "octal": "24",
+      "decimal_index": 20,
+      "name": "Gienah",
+      "bayer": "\u03b3 Corvi",
+      "constellation": "Corvus",
+      "visual_magnitude": 2.8,
+      "agc_xyz": [
+        -0.952563351,
+        -0.05913135,
+        -0.2985406935
+      ],
+      "ra_deg": 183.5521,
+      "dec_deg": -17.37,
+      "ra_hms": {
+        "hours": 12,
+        "minutes": 14,
+        "seconds": 12.5
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 17,
+        "minutes": 22,
+        "seconds": 11.9
+      }
+    },
+    {
+      "octal": "25",
+      "decimal_index": 21,
+      "name": "Acrux",
+      "bayer": "\u03b1 Crucis",
+      "constellation": "Crux",
+      "visual_magnitude": 1.6,
+      "agc_xyz": [
+        -0.4524416631,
+        -0.049270067,
+        -0.8904319167
+      ],
+      "ra_deg": 186.2149,
+      "dec_deg": -62.9276,
+      "ra_hms": {
+        "hours": 12,
+        "minutes": 24,
+        "seconds": 51.6
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 62,
+        "minutes": 55,
+        "seconds": 39.3
+      }
+    },
+    {
+      "octal": "26",
+      "decimal_index": 22,
+      "name": "Spica",
+      "bayer": "\u03b1 Virginis",
+      "constellation": "Virgo",
+      "visual_magnitude": 1.2,
+      "agc_xyz": [
+        -0.9171065276,
+        -0.3500098785,
+        -0.1908106439
+      ],
+      "ra_deg": 200.8891,
+      "dec_deg": -11.0001,
+      "ra_hms": {
+        "hours": 13,
+        "minutes": 23,
+        "seconds": 33.4
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 11,
+        "minutes": 0,
+        "seconds": 0.3
+      }
+    },
+    {
+      "octal": "27",
+      "decimal_index": 23,
+      "name": "Alkaid",
+      "bayer": "\u03b7 Ursae Majoris",
+      "constellation": "Ursa Major",
+      "visual_magnitude": 1.9,
+      "agc_xyz": [
+        -0.5811943804,
+        -0.2907877154,
+        0.7600365758
+      ],
+      "ra_deg": 206.5801,
+      "dec_deg": 49.4674,
+      "ra_hms": {
+        "hours": 13,
+        "minutes": 46,
+        "seconds": 19.2
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 49,
+        "minutes": 28,
+        "seconds": 2.7
+      }
+    },
+    {
+      "octal": "30",
+      "decimal_index": 24,
+      "name": "Menkent",
+      "bayer": "\u03b8 Centauri",
+      "constellation": "Centaurus",
+      "visual_magnitude": 2.3,
+      "agc_xyz": [
+        -0.6899901699,
+        -0.418081795,
+        -0.5908647707
+      ],
+      "ra_deg": 211.2127,
+      "dec_deg": -36.2184,
+      "ra_hms": {
+        "hours": 14,
+        "minutes": 4,
+        "seconds": 51.0
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 36,
+        "minutes": 13,
+        "seconds": 6.2
+      }
+    },
+    {
+      "octal": "31",
+      "decimal_index": 25,
+      "name": "Arcturus",
+      "bayer": "\u03b1 Bo\u00f6tis",
+      "constellation": "Bo\u00f6tes",
+      "visual_magnitude": 0.2,
+      "agc_xyz": [
+        -0.7862552143,
+        -0.5216265404,
+        0.3312227199
+      ],
+      "ra_deg": 213.5616,
+      "dec_deg": 19.343,
+      "ra_hms": {
+        "hours": 14,
+        "minutes": 14,
+        "seconds": 14.8
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 19,
+        "minutes": 20,
+        "seconds": 34.8
+      }
+    },
+    {
+      "octal": "32",
+      "decimal_index": 26,
+      "name": "Alphecca",
+      "bayer": "\u03b1 Coronae Borealis",
+      "constellation": "Corona Borealis",
+      "visual_magnitude": 2.3,
+      "agc_xyz": [
+        -0.5328042377,
+        -0.7159448596,
+        0.4511569595
+      ],
+      "ra_deg": 233.3435,
+      "dec_deg": 26.8179,
+      "ra_hms": {
+        "hours": 15,
+        "minutes": 33,
+        "seconds": 22.4
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 26,
+        "minutes": 49,
+        "seconds": 4.6
+      }
+    },
+    {
+      "octal": "33",
+      "decimal_index": 27,
+      "name": "Antares",
+      "bayer": "\u03b1 Scorpii",
+      "constellation": "Scorpius",
+      "visual_magnitude": 1.2,
+      "agc_xyz": [
+        -0.3518772846,
+        -0.8239967165,
+        -0.4440853383
+      ],
+      "ra_deg": 246.8757,
+      "dec_deg": -26.3648,
+      "ra_hms": {
+        "hours": 16,
+        "minutes": 27,
+        "seconds": 30.2
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 26,
+        "minutes": 21,
+        "seconds": 53.4
+      },
+      "note": "Apollo 13, entering the Moon's shadow. Lovell later named Antares and Nunki as the pair seen then."
+    },
+    {
+      "octal": "34",
+      "decimal_index": 28,
+      "name": "Atria",
+      "bayer": "\u03b1 Trianguli Australis",
+      "constellation": "Triangulum Australe",
+      "visual_magnitude": 1.9,
+      "agc_xyz": [
+        -0.1147906312,
+        -0.3399437395,
+        -0.9334138229
+      ],
+      "ra_deg": 251.3414,
+      "dec_deg": -68.9734,
+      "ra_hms": {
+        "hours": 16,
+        "minutes": 45,
+        "seconds": 21.9
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 68,
+        "minutes": 58,
+        "seconds": 24.2
+      }
+    },
+    {
+      "octal": "35",
+      "decimal_index": 29,
+      "name": "Rasalhague",
+      "bayer": "\u03b1 Ophiuchi",
+      "constellation": "Ophiuchus",
+      "visual_magnitude": 2.1,
+      "agc_xyz": [
+        -0.1126265542,
+        -0.9694679589,
+        0.2178236347
+      ],
+      "ra_deg": 263.3734,
+      "dec_deg": 12.5812,
+      "ra_hms": {
+        "hours": 17,
+        "minutes": 33,
+        "seconds": 29.6
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 12,
+        "minutes": 34,
+        "seconds": 52.5
+      }
+    },
+    {
+      "octal": "36",
+      "decimal_index": 30,
+      "name": "Vega",
+      "bayer": "\u03b1 Lyrae",
+      "constellation": "Lyra",
+      "visual_magnitude": 0.1,
+      "agc_xyz": [
+        0.1216171923,
+        -0.7703014754,
+        0.6259751556
+      ],
+      "ra_deg": 278.9719,
+      "dec_deg": 38.7538,
+      "ra_hms": {
+        "hours": 18,
+        "minutes": 35,
+        "seconds": 53.3
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 38,
+        "minutes": 45,
+        "seconds": 13.7
+      },
+      "note": "Apollo 13. RocketSTEM: John Swigert located Altair and Vega once debris cleared, hours before reentry."
+    },
+    {
+      "octal": "37",
+      "decimal_index": 31,
+      "name": "Nunki",
+      "bayer": "\u03c3 Sagittarii",
+      "constellation": "Sagittarius",
+      "visual_magnitude": 2.1,
+      "agc_xyz": [
+        0.2067145272,
+        -0.8720349419,
+        -0.4436486945
+      ],
+      "ra_deg": 283.3357,
+      "dec_deg": -26.3369,
+      "ra_hms": {
+        "hours": 18,
+        "minutes": 53,
+        "seconds": 20.6
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 26,
+        "minutes": 20,
+        "seconds": 12.9
+      },
+      "note": "Apollo 13, entering the Moon's shadow, with Antares."
+    },
+    {
+      "octal": "40",
+      "decimal_index": 32,
+      "name": "Altair",
+      "bayer": "\u03b1 Aquilae",
+      "constellation": "Aquila",
+      "visual_magnitude": 0.9,
+      "agc_xyz": [
+        0.4535361097,
+        -0.8780537171,
+        0.1527307006
+      ],
+      "ra_deg": 297.3175,
+      "dec_deg": 8.7852,
+      "ra_hms": {
+        "hours": 19,
+        "minutes": 49,
+        "seconds": 16.2
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 8,
+        "minutes": 47,
+        "seconds": 6.7
+      },
+      "note": "Apollo 13. RocketSTEM: sighted with Vega once debris cleared."
+    },
+    {
+      "octal": "41",
+      "decimal_index": 33,
+      "name": "Dabih",
+      "bayer": "\u03b2 Capricorni",
+      "constellation": "Capricornus",
+      "visual_magnitude": 3.2,
+      "agc_xyz": [
+        0.5518160037,
+        -0.793442209,
+        -0.256804515
+      ],
+      "ra_deg": 304.8175,
+      "dec_deg": -14.8805,
+      "ra_hms": {
+        "hours": 20,
+        "minutes": 19,
+        "seconds": 16.2
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 14,
+        "minutes": 52,
+        "seconds": 49.9
+      }
+    },
+    {
+      "octal": "42",
+      "decimal_index": 34,
+      "name": "Peacock",
+      "bayer": "\u03b1 Pavonis",
+      "constellation": "Pavo",
+      "visual_magnitude": 2.1,
+      "agc_xyz": [
+        0.3200014224,
+        -0.443674048,
+        -0.8371095679
+      ],
+      "ra_deg": 305.8012,
+      "dec_deg": -56.8361,
+      "ra_hms": {
+        "hours": 20,
+        "minutes": 23,
+        "seconds": 12.3
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 56,
+        "minutes": 50,
+        "seconds": 10.1
+      }
+    },
+    {
+      "octal": "43",
+      "decimal_index": 35,
+      "name": "Deneb",
+      "bayer": "\u03b1 Cygni",
+      "constellation": "Cygnus",
+      "visual_magnitude": 1.3,
+      "agc_xyz": [
+        0.4540570017,
+        -0.5393383149,
+        0.7091871552
+      ],
+      "ra_deg": 310.0933,
+      "dec_deg": 45.1688,
+      "ra_hms": {
+        "hours": 20,
+        "minutes": 40,
+        "seconds": 22.4
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 45,
+        "minutes": 10,
+        "seconds": 7.7
+      }
+    },
+    {
+      "octal": "44",
+      "decimal_index": 36,
+      "name": "Enif",
+      "bayer": "\u03b5 Pegasi",
+      "constellation": "Pegasus",
+      "visual_magnitude": 2.5,
+      "agc_xyz": [
+        0.8138753897,
+        -0.555906349,
+        0.1690413589
+      ],
+      "ra_deg": 325.6655,
+      "dec_deg": 9.7321,
+      "ra_hms": {
+        "hours": 21,
+        "minutes": 42,
+        "seconds": 39.7
+      },
+      "dec_dms": {
+        "sign": 1,
+        "degrees": 9,
+        "minutes": 43,
+        "seconds": 55.5
+      }
+    },
+    {
+      "octal": "45",
+      "decimal_index": 37,
+      "name": "Fomalhaut",
+      "bayer": "\u03b1 Piscis Austrini",
+      "constellation": "Piscis Austrinus",
+      "visual_magnitude": 1.3,
+      "agc_xyz": [
+        0.8341953207,
+        -0.2394362567,
+        -0.4967780649
+      ],
+      "ra_deg": 343.9851,
+      "dec_deg": -29.7871,
+      "ra_hms": {
+        "hours": 22,
+        "minutes": 55,
+        "seconds": 56.4
+      },
+      "dec_dms": {
+        "sign": -1,
+        "degrees": 29,
+        "minutes": 47,
+        "seconds": 13.4
+      }
+    }
+  ],
+  "bodies": [
+    {
+      "octal": "46",
+      "name": "Sun",
+      "kind": "body"
+    },
+    {
+      "octal": "47",
+      "name": "Earth",
+      "kind": "body"
+    },
+    {
+      "octal": "50",
+      "name": "Moon",
+      "kind": "body"
+    }
+  ]
+}

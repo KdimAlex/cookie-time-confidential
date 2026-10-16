@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patch</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    @font-face {
+      font-family: "Orbitron-Black";
+      src: url("/fonts/Orbitron-Black.ttf") format("truetype");
+      font-weight: 800;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: Orbitron;
+      src: url("/fonts/Orbitron-Black.ttf") format("truetype");
+      font-weight: 800;
+      font-style: normal;
+    }
+  </style>
+</head>
+<body class="patch">
+  <main class="patch-layout">
+    <div class="patch-stage">
+      <div class="badge-stack" id="stack">
+        <svg class="cloth" id="cloth" viewBox="0 0 612 612" role="img" aria-label="Mission patch"></svg>
+        <div class="piece-slot" data-slot="mission"><div class="piece-clip"><svg viewBox="0 0 612 612"></svg></div></div>
+        <div class="piece-slot" data-slot="constellation"><div class="piece-clip"><svg viewBox="0 0 612 612"></svg></div></div>
+        <div class="piece-slot" data-slot="align"><div class="piece-clip"><svg viewBox="0 0 612 612"></svg></div></div>
+        <svg class="overlay" id="overlay" viewBox="0 0 612 612" aria-hidden="true">
+          <text id="name-probe" visibility="hidden" font-family="Orbitron-Black, Orbitron" font-weight="800">A</text>
+          <g id="needle">
+            <path d="M-16,0 L-3,-3.4 L14,0 L-3,3.4 Z" fill="#ffe7a3" stroke="#10243f" stroke-width="1.2" />
+          </g>
+        </svg>
+      </div>
+    </div>
+    <form class="patch-choices" autocomplete="off">
+      <label class="patch-name">
+        Top
+        <input id="top-text" type="text" maxlength="32" value="MASTER STAR NAVIGATOR" spellcheck="false" />
+      </label>
+      <label class="patch-name">
+        Bottom
+        <input id="bottom-text" type="text" maxlength="24" value="RUSTY SCHWEICKART" spellcheck="false" />
+      </label>
+      <fieldset data-group="mission">
+        <legend>Mission · upper left</legend>
+        <button type="button" data-value="apollobadge.svg" aria-pressed="true">Apollo</button>
+        <button type="button" data-value="skylabbadge.svg" aria-pressed="false">Skylab</button>
+        <button type="button" data-value="mercurybadge.svg" aria-pressed="false">Mercury</button>
+        <button type="button" data-value="geminibadge.svg" aria-pressed="false">Gemini</button>
+      </fieldset>
+      <fieldset data-group="constellation">
+        <legend>Constellation · upper right</legend>
+        <button type="button" data-value="casseopiabadge.svg" aria-pressed="true">Cassiopeia</button>
+        <button type="button" data-value="aquilabadge.svg" aria-pressed="false">Aquila</button>
+        <button type="button" data-value="canusmajorbadge.svg" aria-pressed="false">Canis Major</button>
+        <button type="button" data-value="scorpiusbadge.svg" aria-pressed="false">Scorpius</button>
+        <button type="button" data-value="ursamajorbadge.svg" aria-pressed="false">Ursa Major</button>
+      </fieldset>
+      <fieldset data-group="align">
+        <legend>Align · bottom</legend>
+        <button type="button" data-value="cookiebadge.svg" aria-pressed="true">Score</button>
+      </fieldset>
+      <button class="patch-play" id="play" type="button">Play the awarding</button>
+    </form>
+  </main>
+  <script src="/vendor/gsap.min.js"></script>
+  <script src="/badge.js"></script>
+</body>
+</html>

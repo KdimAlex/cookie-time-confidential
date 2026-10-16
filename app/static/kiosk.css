@@ -1,0 +1,1293 @@
+:root {
+  --ink: var(--ctc-black-stage);
+  --paper: var(--ctc-white);
+  --space: var(--ctc-blue);
+  --paper-ink: var(--ctc-ink);
+  --green: var(--ctc-green);
+  --term: var(--ctc-green-field);
+  --term-edge: var(--ctc-black);
+  --pill: var(--ctc-green-button);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: #e6e6e6;
+  color: #fff;
+  font-family: var(--ctc-font-grotesque);
+}
+
+#kiosk { order: 1; }
+#critique { order: 2; }
+
+/* The sticker is the top layer, so the rise crosses the speech bubble
+   instead of sliding out from behind it. */
+#badge {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  margin: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+#critique {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 10px;
+  background: #ececec;
+  color: #6d6d6d;
+  font-size: 13px;
+}
+
+#critique button {
+  border: 2px solid var(--green);
+  background: var(--pill);
+  color: var(--green);
+  font: inherit;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 3px 12px;
+  line-height: 1.2;
+}
+
+#critique button:hover { text-decoration: none; }
+
+#where {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#count {
+  color: #9a9a9a;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+#live {
+  margin-left: 8px;
+  font-style: normal;
+  color: #0b7a45;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#kiosk {
+  position: relative;
+  container-type: size;
+  flex: 0 0 auto;
+  align-self: center;
+  width: min(100%, calc((100vh - 36px) * 1024 / 667));
+  aspect-ratio: var(--ctc-building-ratio);
+  max-height: calc(100% - 36px);
+  margin-block: auto;
+  overflow: hidden;
+  background: var(--ctc-black-stage);
+}
+
+#world,
+#sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+#world { opacity: var(--ctc-building-opacity); }
+
+#sky {
+  z-index: 1;
+  opacity: 0;
+}
+
+#cast {
+  position: absolute;
+  z-index: 5;
+  left: var(--ctc-astronaut-left);
+  width: var(--ctc-astronaut-width);
+  bottom: var(--ctc-bubble-min-height);
+  pointer-events: none;
+}
+
+#cast img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: translateY(var(--ctc-astronaut-overlap));
+}
+
+#plate {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: var(--ctc-bubble-min-height);
+}
+
+/* The mission folder covers the astronaut where they overlap.
+   The plate stays transparent, so the rest of him still shows. */
+body.is-mission #plate { z-index: 5; }
+body.is-mission #cast { z-index: 4; }
+
+/* Cookie Time. The plate is the area above the speech bubble, so these
+   tops are the Canva frame's positions divided by that area. */
+.cookies {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cookies span {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  animation: cookie-in 0.55s ease forwards;
+}
+
+.cookies img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: rotate(var(--spin));
+  /* Drift lives on the image so it multiplies with the span's settle
+     and never shares a transform with the leave fade. */
+  animation: cookie-float 16s ease-in-out infinite backwards;
+}
+
+/* DOM order is left, center, right. Each settles once, then holds.
+   The float waits until that cookie's 0.55s settle has finished.
+   Different periods keep the three from moving in lockstep. */
+.cookies span:nth-child(1) { left: 16.7%; top: 11%; width: 20.1%; animation-delay: 0s; }
+.cookies span:nth-child(2) { left: 38.6%; top: 45%; width: 21.9%; animation-delay: 0.42s; }
+.cookies span:nth-child(3) { left: 67.8%; top: 11%; width: 19%; animation-delay: 0.84s; }
+.cookies span:nth-child(1) img { animation-delay: 0.55s; }
+.cookies span:nth-child(2) img { animation-delay: 0.97s; animation-duration: 19s; }
+.cookies span:nth-child(3) img { animation-delay: 1.39s; animation-duration: 13s; }
+
+@keyframes cookie-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Middle of the old 16s drift, opacity left out. The bite angle stays in --spin. */
+@keyframes cookie-float {
+  0%, 100% { transform: translateY(0) rotate(calc(var(--spin) - 3deg)); }
+  34%      { transform: translateY(-7px) rotate(calc(var(--spin) + 6deg)); }
+  66%      { transform: translateY(4px) rotate(calc(var(--spin) - 2deg)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookies span {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .cookies img {
+    animation: none;
+    transform: rotate(var(--spin));
+  }
+}
+
+#slot {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--ctc-black-stage);
+}
+
+/* Same hidden bed the align and find games use. Kept barely visible so
+   YouTube does not pause a fully hidden player. */
+#bed-host {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  height: 113px;
+  opacity: 0.02;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body[data-mode="game"] #slot { z-index: 5; touch-action: none; }
+body[data-mode="game"] #plate { pointer-events: none; }
+
+#terminal {
+  position: absolute;
+  z-index: 6;
+  left: var(--ctc-bubble-left);
+  right: var(--ctc-bubble-right);
+  bottom: var(--ctc-bubble-bottom);
+  height: var(--ctc-bubble-min-height);
+  padding: var(--ctc-bubble-pad-top) var(--ctc-bubble-pad-x) var(--ctc-bubble-pad-bottom);
+  border: 0;
+  overflow: hidden;
+  background: url("/kiosk/art/speech-bubble.svg") top left / 100% var(--ctc-bubble-art-height) no-repeat;
+  color: var(--green);
+  cursor: default;
+}
+
+#terminal.is-tap { cursor: pointer; }
+
+#who {
+  position: absolute;
+  right: var(--ctc-who-right);
+  top: -1.7em;
+  color: var(--ctc-white);
+  font-family: var(--ctc-font-grotesque);
+  font-size: var(--ctc-instructor-size);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+#line {
+  margin: 0;
+  font-family: var(--ctc-font-dialogue);
+  font-size: var(--ctc-dialogue-size);
+  line-height: var(--ctc-dialogue-leading);
+  letter-spacing: 0.01em;
+}
+
+#terminal.is-tap #line::after,
+#terminal.is-typing #line::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.95em;
+  margin-left: 4px;
+  background: var(--green);
+  vertical-align: -0.12em;
+  animation: blink 1.05s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+#name-box {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 34%;
+  transform: translate(-50%, -50%);
+  width: min(560px, 62vw);
+}
+
+#name-box label {
+  display: block;
+  padding: 16px 22px;
+  border: 1.5px solid var(--green);
+  border-radius: 18px;
+  background: var(--term);
+  box-shadow: 0 0 0 6px var(--term-edge), 0 0 0 7.5px var(--green);
+}
+
+#name {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font-family: var(--ctc-font-dialogue);
+  font-size: clamp(20px, 2vw, 32px);
+  outline: none;
+}
+
+#name::placeholder { color: #1f7a45; }
+
+body[data-mode="idle"] #world,
+body[data-mode="idle"] #sky,
+body[data-mode="idle"] #cast,
+body[data-mode="game"] #world,
+body[data-mode="game"] #sky,
+body[data-mode="game"] #cast,
+body[data-mode="game"] #terminal,
+body[data-mode="print"] #sky,
+body[data-mode="print"] #cast,
+body[data-mode="sky"] #world,
+body[data-mode="sky"] #sky {
+  visibility: hidden;
+}
+
+body[data-mode="idle"] #plate,
+body[data-mode="game"] #plate {
+  bottom: 0;
+}
+
+/* The portico stays behind the finale. The speech box keeps its place
+   and stays above the plate so the Morehead line can be read. */
+body[data-mode="print"] #terminal {
+  visibility: visible;
+  z-index: 8;
+}
+
+body[data-mode="quote"] #cast { visibility: hidden; }
+
+/* Rusty’s quote fills the kiosk. The instructor terminal stays put for other screens. */
+body.is-rusty-quote #plate { bottom: 0; }
+
+/* Charlie’s quote uses the shared instructor terminal, lifted above him. */
+body.is-duke-quote #plate { bottom: 0; }
+
+.idle {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+}
+
+.idle h1 {
+  margin: 0;
+  font-size: clamp(48px, 8vw, 112px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.cookie {
+  width: min(180px, 28vw);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  animation: bob 3.4s ease-in-out infinite;
+}
+
+.cookie { position: relative; }
+.cookie img { display: block; width: 100%; height: auto; }
+.cookie span {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+@keyframes bob {
+  50% { transform: translateY(8px); }
+}
+
+.card-row {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+  justify-items: center;
+  padding-top: 22px;
+}
+
+.folder {
+  position: relative;
+  width: min(78%, calc(100% - 96px));
+  aspect-ratio: 1054 / 649;
+  max-height: 100%;
+  container-type: inline-size;
+  background: url("/kiosk/art/folder.svg") center / 100% 100% no-repeat;
+  color: var(--paper-ink);
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+  touch-action: none;
+  transform-origin: center center;
+}
+
+.folder.is-zoomed { z-index: 2; }
+
+.folder .go,
+.folder .pill { touch-action: none; }
+
+.folder.is-asset {
+  width: min(69%, calc(100% - 120px));
+  height: auto;
+  max-height: none;
+  aspect-ratio: auto;
+  background: none;
+}
+
+.folder.is-asset .folder-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.folder.is-asset .go {
+  position: absolute;
+  left: 28.14%;
+  top: 79.07%;
+  width: 43.71%;
+  height: 13.86%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.file-row {
+  position: relative;
+  height: 100%;
+  touch-action: none;
+}
+
+/* Chevrons sit on the front constellation card only.
+   Width was 37.2% (left 31.4%), which left a 26.4% gap between the
+   glyphs (two 5.4cqi buttons). 39.84% is that gap plus 10%, still centered. */
+.file-row .arrows {
+  inset: auto;
+  left: 30.08%;
+  width: 39.84%;
+  top: 4%;
+  height: 90%;
+  z-index: 3;
+}
+
+.file-row .arrows button {
+  width: 5.4cqi;
+  height: 8.6cqh;
+}
+
+.file-row .arrows button img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Where Start Training and Save the Ship sit. Size, type, and color
+   come only from button.pill so a layout tweak cannot shrink one of them. */
+.file-row > .pill,
+.launch > .pill {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 1.05%;
+  transform: translateX(-50%);
+}
+
+.folder-top { display: contents; }
+
+.folder h2 {
+  margin: 0;
+  font-family: var(--ctc-font-grotesque);
+  font-size: clamp(28px, 7.2cqi, 64px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+}
+
+.folder .kicker {
+  margin: 0 0 0.15em;
+  font-family: var(--ctc-font-grotesque);
+  letter-spacing: 0.22em;
+  font-size: clamp(11px, 1.7cqi, 16px);
+  font-weight: 600;
+}
+
+.folder .copy {
+  position: absolute;
+  left: 44%;
+  top: 13.5%;
+  right: 4%;
+  text-align: center;
+}
+
+.cookie-mark {
+  position: absolute;
+  left: 50%;
+  top: 0.55em;
+  width: 78%;
+  height: auto;
+  transform: translateX(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.folder .kicker,
+.folder h2,
+.folder .blurb {
+  position: relative;
+  z-index: 1;
+}
+
+.folder .blurb {
+  margin: 0.7em 0 0;
+  line-height: 1.25;
+  font-size: clamp(11px, 1.7cqi, 16px);
+  font-family: var(--ctc-font-grotesque);
+}
+
+.folder .mission-body {
+  position: absolute;
+  left: 6.6%;
+  right: 6%;
+  top: 60%;
+  margin: 0;
+  line-height: 1.3;
+  font-size: clamp(11px, 1.65cqi, 16px);
+  font-family: var(--ctc-font-grotesque);
+}
+
+.art {
+  position: absolute;
+  left: 6.56%;
+  top: 13.23%;
+  width: 35.48%;
+  height: 43.14%;
+  background: var(--space);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.art.is-blank {
+  display: grid;
+  place-items: center;
+  color: var(--green);
+  font-family: var(--ctc-font-grotesque);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  font-size: clamp(12px, 2cqi, 18px);
+}
+
+/* Same box as button.pill, written as a fraction of the mission folder
+   because that card is the containing block. */
+.folder .pill {
+  position: absolute;
+  left: 31.1%;
+  top: 82.6%;
+  width: 37.8%;
+  height: 13.25%;
+  min-width: 37.8%;
+  min-height: 13.25%;
+  margin: 0;
+}
+
+.arrows {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.arrows button, .go {
+  pointer-events: auto;
+  border: 0;
+  cursor: pointer;
+}
+
+.arrows button {
+  width: 64px;
+  height: 72px;
+  padding: 0;
+  border-radius: 8px;
+  background: transparent;
+}
+
+.arrows button img { width: 70%; height: 70%; display: block; margin: auto; object-fit: contain; }
+
+/* Mission chevrons: the svg viewBox is mostly padding, so the button is
+   larger than the green glyph. Sized so the glyph is about 32×52 on a
+   1024-wide frame, centered on the folder, ~25px off its side edges. */
+.card-row .arrows {
+  top: 22px;
+  right: auto;
+  bottom: 0;
+  left: 50%;
+  width: calc(min(78%, calc(100% - 96px)) + 13.56cqi);
+  height: auto;
+  transform: translateX(-50%);
+}
+
+.card-row:has(.folder.is-asset) .arrows {
+  width: calc(min(69%, calc(100% - 120px)) + 13.56cqi);
+}
+
+.card-row .arrows button {
+  width: 5.56cqi;
+  height: 7.07cqi;
+  flex: none;
+}
+
+.card-row .arrows button img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Every primary action: Confirm Mission, Start Training, Save the Ship.
+   The box is the mission folder's pill (37.8% of a 78%-wide card), measured
+   live as about 394×84. Anchored to the kiosk, not the parent's width. */
+button.pill {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: calc(0.378 * min(78cqi, 100cqi - 96px));
+  height: min(calc(0.1325 * (100% - 22px)), calc(0.0815868 * min(78cqi, 100cqi - 96px)));
+  min-width: calc(0.378 * min(78cqi, 100cqi - 96px));
+  min-height: min(calc(0.1325 * (100% - 22px)), calc(0.0815868 * min(78cqi, 100cqi - 96px)));
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  background: var(--pill);
+  color: var(--green);
+  font-family: var(--ctc-font-grotesque);
+  font-weight: 700;
+  font-size: var(--ctc-button-size);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: 999px;
+  border: var(--ctc-button-stroke) solid var(--green);
+  cursor: pointer;
+}
+
+.launch {
+  position: relative;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+#storm-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#storm-flash.is-on {
+  animation: storm-strike 0.62s ease-out;
+}
+
+@keyframes storm-strike {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  22% { opacity: 0.04; }
+  34% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+.files {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  width: auto;
+  transform-origin: 50% 48%;
+  touch-action: none;
+}
+
+.const-card {
+  position: absolute;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.42));
+}
+
+.const-card.is-left { left: 15.83%; top: 7.1%; width: 26.94%; z-index: 1; }
+.const-card.is-right { left: 57.27%; top: 7.1%; width: 26.94%; z-index: 1; }
+.const-card.is-center {
+  left: 34.92%;
+  top: 3.99%;
+  width: 30.15%;
+  z-index: 2;
+  filter: drop-shadow(0 22px 26px rgba(0, 0, 0, 0.5));
+}
+
+.quote {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 24px;
+  align-items: end;
+  padding: 6vh 6vw 2vh;
+}
+
+.bubble {
+  margin: 0;
+  background: var(--term);
+  color: var(--green);
+  border: 1.5px solid var(--green);
+  border-radius: 28px;
+  padding: 22px 26px;
+  font-family: var(--ctc-font-dialogue);
+  font-size: clamp(16px, 1.6vw, 24px);
+  line-height: 1.45;
+  box-shadow: 0 0 0 7px var(--term-edge), 0 0 0 8.5px var(--green);
+  position: relative;
+}
+
+.bubble::after { content: none; }
+
+.pass {
+  background: var(--paper);
+  color: #1c1c1c;
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
+  align-self: end;
+  font-family: var(--ctc-font-grotesque);
+}
+
+.pass .who-pic {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  background: #d5e3ea;
+}
+
+.pass strong { display: block; }
+.pass span { display: block; font-size: 13px; }
+
+.rusty-quote {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.rusty-bubble,
+.rusty-portrait {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+
+.rusty-bubble {
+  left: 2%;
+  width: 96%;
+  top: 4.3%;
+}
+
+.rusty-portrait {
+  left: 50%;
+  bottom: 0;
+  height: 54%;
+  width: auto;
+  /* SVG viewport. Without this, a not-yet-decoded img is 0px wide and
+     translateX(-50%) resolves to 0, so the figure snaps in from the right. */
+  aspect-ratio: 783 / 546;
+  transform: translateX(-50%);
+}
+
+/* Stepping on from the ID card. Same short rise as that card.
+   A direct load has no .is-arriving, so it is already in this pose.
+   Charlie’s quote shares the rise and the 18px bubble settle. */
+.rusty-quote.is-arriving .rusty-portrait,
+.duke-quote.is-arriving .duke-portrait {
+  animation: rusty-portrait-rise 0.62s cubic-bezier(0.16, 0.84, 0.32, 1) both;
+}
+
+.rusty-quote.is-arriving .rusty-bubble,
+.duke-quote.is-arriving .duke-bubble {
+  animation: rusty-bubble-in 0.62s cubic-bezier(0.16, 0.84, 0.32, 1) both;
+}
+
+@keyframes rusty-portrait-rise {
+  from { transform: translate(-50%, 110%); }
+  to { transform: translate(-50%, 0); }
+}
+
+@keyframes rusty-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rusty-quote.is-arriving .rusty-portrait,
+  .rusty-quote.is-arriving .rusty-bubble,
+  .duke-quote.is-arriving .duke-portrait,
+  .duke-quote.is-arriving .duke-bubble {
+    animation: none;
+  }
+}
+
+.duke-quote {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.duke-bubble {
+  position: absolute;
+  left: 2%;
+  width: 96%;
+  top: 0.8%;
+  aspect-ratio: 1476 / 456;
+}
+
+.duke-bubble img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.duke-bubble img.duke-words {
+  position: absolute;
+  left: 10.5%;
+  top: 14.05%;
+  width: 79%;
+  height: auto;
+}
+
+.duke-portrait {
+  position: absolute;
+  display: block;
+  left: 50%;
+  bottom: 0;
+  height: 54%;
+  width: auto;
+  aspect-ratio: 709 / 466;
+  transform: translateX(-50%);
+}
+
+.ident {
+  height: 100%;
+  background: #000;
+  color: var(--green);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 3vh 4vw 4vh;
+  font-family: var(--ctc-font-dialogue);
+}
+
+.ident header, .ident footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ident h2 {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(28px, 4vw, 54px);
+  letter-spacing: 0.08em;
+}
+
+.ports {
+  display: flex;
+  justify-content: center;
+  gap: 8vw;
+  align-items: center;
+}
+
+.ports button {
+  width: min(280px, 30vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid var(--green);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.ports button svg { width: 100%; height: 100%; }
+.ports button.is-wrong { animation: shake 0.35s linear; }
+.ports button.is-right { box-shadow: 0 0 0 4px var(--green); }
+
+@keyframes shake {
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.widget, .diagram, .globe-wrap, .trace {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.panel-stack {
+  width: min(460px, 70%);
+  background: var(--term);
+  border: 2px solid var(--green);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.panel { height: 150px; position: relative; }
+.panel svg { width: 100%; height: 100%; display: block; }
+.panel span {
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+
+.near { animation: drive 4.5s linear infinite; }
+.far { }
+
+@keyframes drive {
+  from { transform: translateX(70px); }
+  to { transform: translateX(-80px); }
+}
+
+.trace svg, .diagram svg, .globe-wrap svg { width: min(520px, 70%); height: auto; }
+
+.trace svg { touch-action: none; cursor: crosshair; background: var(--space); border-radius: 12px; }
+
+/* Print finale. The medal sits large on the left. These meters sketch in
+   on its right, then idle, then feed downward with the cloth. */
+.report {
+  --land: 0.52s;
+  --fill-time: 1.22s;
+  --stagger: 0.55s;
+  --lag: 0.36s;
+  --idle: 2.2s;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+  pointer-events: none;
+}
+
+.report-stage {
+  position: absolute;
+  right: 4%;
+  top: 14%;
+  width: min(42%, 560px);
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.report-meters {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7%;
+}
+
+.meter { width: 100%; }
+
+.meter-label {
+  display: block;
+  height: auto;
+  margin: 0 0 2.2% 0;
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.meter-track {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 546 / 66;
+}
+
+.meter-edge {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+}
+
+.meter-fill {
+  position: absolute;
+  left: 2.4725%;
+  top: 20.4545%;
+  height: 59.0909%;
+  width: 0;
+  background-color: #42f489;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 100% 100%;
+}
+
+.report.is-on .meter-label {
+  animation: report-land var(--land) cubic-bezier(0.16, 0.84, 0.22, 1) forwards;
+}
+
+.report.is-on .meter-edge {
+  animation: track-sketch var(--land) cubic-bezier(0.16, 0.84, 0.22, 1) forwards;
+}
+
+.report.is-on .meter-fill {
+  animation: meter-weigh var(--fill-time) cubic-bezier(0.55, 0.04, 0.12, 1) forwards;
+}
+
+.report.is-on .meter:nth-child(1) .meter-label,
+.report.is-on .meter:nth-child(1) .meter-edge { animation-delay: 0s; }
+
+.report.is-on .meter:nth-child(2) .meter-label,
+.report.is-on .meter:nth-child(2) .meter-edge { animation-delay: var(--stagger); }
+
+.report.is-on .meter:nth-child(3) .meter-label,
+.report.is-on .meter:nth-child(3) .meter-edge { animation-delay: calc(var(--stagger) * 2); }
+
+.report.is-on .meter:nth-child(1) .meter-fill { animation-delay: var(--lag); }
+
+.report.is-on .meter:nth-child(2) .meter-fill { animation-delay: calc(var(--stagger) + var(--lag)); }
+
+.report.is-on .meter:nth-child(3) .meter-fill { animation-delay: calc(var(--stagger) * 2 + var(--lag)); }
+
+.report.is-hold .report-meters {
+  animation: report-idle var(--idle) ease-in-out forwards;
+}
+
+.report-send {
+  position: absolute;
+  left: 50%;
+  bottom: 6.5%;
+  margin: 0;
+  padding: 0 28px;
+  height: 64px;
+  border: var(--ctc-button-stroke) solid var(--green);
+  border-radius: 999px;
+  background: var(--pill);
+  color: var(--green);
+  font-family: var(--ctc-font-grotesque);
+  font-size: var(--ctc-button-size);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.report-send:disabled { cursor: default; }
+
+@keyframes report-land {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes track-sketch {
+  0% { opacity: 1; clip-path: inset(0 100% 0 0); }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+@keyframes meter-weigh {
+  from { width: 0; }
+  to { width: var(--fill); }
+}
+
+@keyframes report-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report.is-on .meter-label,
+  .report.is-settled .meter-label,
+  .report.is-on .meter-edge,
+  .report.is-settled .meter-edge {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+
+  .meter-fill,
+  .report.is-on .meter-fill,
+  .report.is-settled .meter-fill {
+    animation: none;
+    width: var(--fill);
+  }
+
+  .report.is-hold .report-meters { animation: none; }
+
+  .report.is-on .report-send,
+  .report.is-settled .report-send {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+  }
+}
+
+/* Rusty at Morehead. The ID card rises from below into the open portico, above the bubble. */
+
+.id-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 21cqh;
+  width: 43%;
+  height: auto;
+  margin-inline: auto;
+  pointer-events: none;
+  animation: id-card-rise 0.62s cubic-bezier(0.16, 0.84, 0.32, 1) both;
+}
+
+@keyframes id-card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(42px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .id-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+body.is-guiding #kiosk {
+  background: radial-gradient(120% 90% at 10% 0%, #02091d 0%, #031133 55%, #031338 100%);
+}
+
+body.is-guiding #world,
+body.is-guiding #sky {
+  opacity: 0 !important;
+}
+
+.guiding-live {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(640px, 86%);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  animation: guiding-in 0.12s linear both;
+}
+
+.guiding-live .gs-wrap {
+  background: transparent;
+}
+
+.guiding-live .gs-btn {
+  display: none;
+}
+
+@keyframes guiding-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guiding-live { animation: none; }
+}
+
+/* Leaving Stars as landmarks. Same navy as the game field, held over
+   the portico and the globe (the plate), under the astronaut and the
+   speech box. The widget rides in the stage so it leaves with the field. */
+.guiding-veil {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  pointer-events: none;
+  opacity: 1;
+  background: radial-gradient(120% 90% at 10% 0%, #02091d 0%, #031133 55%, #031338 100%);
+}
+
+.guiding-veil-stage {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: var(--ctc-bubble-min-height);
+}
+
+/* Guiding stars. The plate stops at the speech box, so this layer is
+   sized to the kiosk and paints behind the astronaut and the bubble.
+   No fill: the knocked-out globe sits on the portico. */
+.star-globe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100cqh;
+  pointer-events: none;
+}
+
+.star-globe img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sky-hit {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Solve the triangle. The field is the applet sky (navy #031133, same
+   radial as star-navigation’s card) so the diagram has no rectangle edge.
+   The speech line is not faded; only #sky crossfades this field in. */
+body.is-triangle #kiosk {
+  background: radial-gradient(120% 120% at 15% 0%, #02091d 0%, #031133 55%, #031338 100%);
+}
+
+.triangle-live {
+  position: absolute;
+  left: 50%;
+  top: 13%;
+  width: 66%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.triangle-live .sn-head { display: none; }
+
+.triangle-live .sn-wrap {
+  background: transparent;
+  overflow: visible;
+}
+
+.triangle-live .sn-wrap > svg { overflow: visible; }
+
+.triangle-live .sn-wrap > svg > rect {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie, .near, #terminal.is-tap #line::after, #terminal.is-typing #line::after { animation: none; }
+}

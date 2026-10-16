@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mission badge</title>
+  <link rel="stylesheet" href="./badge.css?v=4" />
+  <style>
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+    html.exporting, html.exporting body {
+      background: transparent !important;
+    }
+    body {
+      margin: 0;
+      background: #fff;
+      color: #1a1a1c;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    main {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 0;
+    }
+    #readout { display: none; }
+    pre {
+      margin: 0;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    button {
+      margin-top: 1rem;
+      font: inherit;
+      padding: 0.5rem 0.8rem;
+      border: 1px solid #1a1a1c;
+      background: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div id="badge"></div>
+    <section id="readout">
+      <pre id="out">Loading the sticker.</pre>
+      <button type="button" id="again">Play the awarding</button>
+    </section>
+  </main>
+  <script src="./vendor/gsap.min.js"></script>
+  <script src="./classify.js"></script>
+  <script src="./player.js?v=16"></script>
+  <script>
+    const record = {
+      name: "Rusty Schweickart",
+      mission: "apollo",
+      dominant: "cassiopeia",
+      constellationMarks: [{ right: true }],
+      alignMarks: [
+        { name: "Easy", percent: 96, weight: 1 },
+        { name: "Intermediate", percent: 88, weight: 1.5 },
+        { name: "Hard", percent: 74, weight: 2 },
+      ],
+      findMarks: [
+        { name: "Easy", right: true },
+        { name: "Intermediate", right: true },
+        { name: "Hard", right: false },
+      ],
+    };
+
+    const exporting = new URLSearchParams(location.search).has("export");
+    if (exporting) document.documentElement.classList.add("exporting");
+
+    const out = document.getElementById("out");
+    let badge;
+
+    function show(result) {
+      out.textContent = [
+        "align " + result.align,
+        "find " + result.find,
+        "constellation " + result.constellation,
+        "sky " + result.sky,
+        "ship " + result.ship,
+        "composite " + result.composite,
+        "rankScore " + result.rankScore,
+        "rank " + result.rank,
+        "role " + result.role,
+        "title " + result.title,
+      ].join("\n");
+    }
+
+    async function play() {
+      const result = MissionClassify.classify(record);
+      show(result);
+      await badge.award({ ...record, rank: result.rank, title: result.title });
+    }
+
+    MissionBadge.mount(document.getElementById("badge")).then(async (mounted) => {
+      badge = mounted;
+      window.badge = mounted;
+      if (exporting) return;
+      document.getElementById("again").addEventListener("click", play);
+      await play();
+    });
+  </script>
+</body>
+</html>

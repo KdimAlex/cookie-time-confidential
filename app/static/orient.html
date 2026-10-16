@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Align the stars</title>
+  <link rel="stylesheet" href="/brand.css?v=1">
+  <link rel="stylesheet" href="/orient.css?v=61">
+</head>
+<body class="is-pick">
+  <img id="ship" src="/spaceship.svg?v=5" alt="">
+  <textarea id="console" readonly spellcheck="false" aria-label="Console text"></textarea>
+  <p id="task"></p>
+  <div id="time" hidden><b id="time-count"></b><i id="time-bar"></i></div>
+  <div id="flash"></div>
+  <main>
+    <div id="stage">
+      <p id="kicker">Easy</p>
+      <div id="port-wrap">
+        <svg id="port" tabindex="-1" viewBox="0 0 200 200" aria-label="Porthole. Left arrow turns counter-clockwise, right arrow turns clockwise.">
+          <defs>
+            <clipPath id="port-clip"><circle cx="100" cy="100" r="96"></circle></clipPath>
+          </defs>
+          <circle id="disc" cx="100" cy="100" r="96"></circle>
+          <g id="field" clip-path="url(#port-clip)"></g>
+          <polyline id="bolt" points="128,14 102,78 126,88 70,188"></polyline>
+        </svg>
+      </div>
+      <div id="below">
+        <div class="instrument" id="instrument">
+          <svg id="sextant" viewBox="-0.55 -0.32 1.1 0.64" aria-label="Sextant">
+            <rect x="-0.55" y="-0.32" width="1.1" height="0.64"></rect>
+            <g id="sex-stars"></g>
+            <line class="hair" x1="-0.55" y1="0" x2="0.55" y2="0"></line>
+            <line class="hair" x1="0" y1="-0.32" x2="0" y2="0.32"></line>
+          </svg>
+          <div class="lower">
+            <div class="controls" id="controls">
+              <button type="button" id="done">Done</button>
+            </div>
+          </div>
+        </div>
+        <p id="found" hidden></p>
+        <div id="pick" hidden>
+          <button type="button" id="pick-align">Align</button>
+          <button type="button" id="pick-find">Find</button>
+        </div>
+        <ol id="marks" hidden></ol>
+        <div id="switchers" hidden>
+          <button type="button" id="again" hidden>Again</button>
+          <button type="button" id="swap" hidden>Find</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="bed-host" aria-hidden="true"><div id="bed"></div></div>
+  <p id="readout" hidden></p>
+  <div id="joy-base" role="slider" aria-label="Turn the spacecraft" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" aria-orientation="horizontal">
+    <img id="joy-stick" src="/joystick.svg?v=2" alt="" draggable="false">
+  </div>
+  <svg id="link" aria-hidden="true"><line id="stem"></line></svg>
+  <script src="/stars.js?v=1"></script>
+  <script src="/orient.js?v=85"></script>
+</body>
+</html>
