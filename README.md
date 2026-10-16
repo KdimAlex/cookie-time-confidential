@@ -14,7 +14,9 @@ cd app && python3 server.py
 - Sky: http://127.0.0.1:8881/
 - Patent sheets: http://127.0.0.1:8881/sheets
 
-The server uses the Python standard library. No install step.
+The server uses the Python standard library. No install step. Start at the kiosk link and use Next, or the right arrow, to move through the whole session.
+
+The screens, games, badge, artwork, and sound effects are in this repo, so the kiosk runs from these files. The background song under Align and Find streams from YouTube, so that one track needs an internet connection.
 
 ## What’s in this repo
 
