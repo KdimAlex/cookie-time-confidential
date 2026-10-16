@@ -423,7 +423,7 @@
       }
     }
 
-    function typeLine(which, text) {
+    function typeLine(which, text, step) {
       writeLine(which, text, reduce);
       shown[which] = reduce && Boolean(String(text || "").trim());
       if (reduce || !letters[which].length) {
@@ -431,6 +431,7 @@
         return gsap.timeline();
       }
       const arc = ARCS[which];
+      const dwell = step || 0.072;
       const tl = gsap.timeline();
       letters[which].forEach((letter) => {
         const space = letter.ch === " ";
@@ -440,7 +441,7 @@
           moveNeedle(point.x, point.y, letter.ang + 90 * arc.dir);
           if (!space) letter.el.style.opacity = "1";
         });
-        tl.to({}, { duration: space ? 0.04 : 0.072 });
+        tl.to({}, { duration: space ? dwell * 0.55 : dwell });
       });
       tl.call(() => {
         shown[which] = Boolean(String(text || "").trim());
@@ -600,9 +601,10 @@
         return enqueue(() => typeLine("name", text));
       },
 
-      /* Top arc, one letter at a time. Pass the title from classify(). */
+      /* Top arc, one letter at a time. Slower than the name so the
+         final designation reads as it is stitched. */
       title(text) {
-        return enqueue(() => typeLine("title", text));
+        return enqueue(() => typeLine("title", text, 0.34));
       },
 
       /* Upper left. id: apollo, skylab, mercury, gemini. */

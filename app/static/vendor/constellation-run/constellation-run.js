@@ -268,7 +268,7 @@
     wrap.setAttribute('role', 'application');
     wrap.setAttribute('aria-label', 'Constellation Run. Steer the ship left or right through the constellation that matches the name. Arrow keys, A and D, or drag.');
     var ws = wrap.style;
-    ws.position = 'relative'; ws.width = '100%'; ws.background = C.bg; ws.overflow = 'hidden';
+    ws.position = 'relative'; ws.width = '100%'; ws.height = '100%'; ws.background = C.bg; ws.overflow = 'hidden';
     ws.outline = 'none'; ws.userSelect = 'none'; ws.webkitUserSelect = 'none';
     ws.webkitTapHighlightColor = 'transparent'; ws.touchAction = 'pan-y'; ws.cursor = 'pointer';
 
@@ -294,26 +294,31 @@
 
     // ---- layout ----
     var L = LAYOUTS.wide, W = L.W, H = L.H, sx = 1, sy = 1, streaks = [];
+    var isWide = true;
     function makeStreaks() {
       streaks = [];
       for (var i = 0; i < 120; i++) streaks.push({ x: rnd(0, W), y: rnd(0, H), z: rnd(0.25, 1), a: rnd(0.15, 0.6) });
     }
     function resize() {
-      var cssW = wrap.getBoundingClientRect().width;
-      var next = cssW > 0 && cssW < 620 ? LAYOUTS.tall : LAYOUTS.wide;
-      if (next !== L || !streaks.length) {
+      var r = wrap.getBoundingClientRect();
+      var cssW = r.width, cssH = r.height;
+      var base = cssW > 0 && cssW < 620 ? LAYOUTS.tall : LAYOUTS.wide;
+      var nextH = base.H;
+      if (cssW > 0 && cssH > 0) nextH = Math.max(base.H, base.W * (cssH / cssW));
+      var nextShip = nextH - (base.H - base.shipY);
+      if (isWide !== (base === LAYOUTS.wide) || Math.abs(H - nextH) > 0.5 || !streaks.length) {
         var fx = ship ? ship.x / W : 0.5;
-        L = next; W = L.W; H = L.H; ws.aspectRatio = L.ratio; makeStreaks();
+        isWide = base === LAYOUTS.wide;
+        L = { W: base.W, H: nextH, shipY: nextShip, gateR: base.gateR, gateDX: base.gateDX };
+        W = L.W; H = L.H; makeStreaks();
         if (ship) ship.x = fx * W;
       }
-      var r = wrap.getBoundingClientRect();
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.max(1, Math.round(r.width * dpr));
       canvas.height = Math.max(1, Math.round(r.height * dpr));
       sx = canvas.width / W; sy = canvas.height / H;
     }
     var ship = null;
-    ws.aspectRatio = L.ratio;
     resize();
     var ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null;
     if (ro) ro.observe(wrap); else window.addEventListener('resize', resize);
@@ -685,7 +690,7 @@
     function drawHUD() {
       // target name (always visible while the portals approach)
       if (phase !== 'intro' || phaseT > INTRO * 0.75) {
-        var wide = L === LAYOUTS.wide;
+        var wide = isWide;
         glowOn(5);
         ink(C.teal);
         drawText(ctx, 'FIND', W / 2, wide ? 14 : 92, 11, 'center');
@@ -710,7 +715,7 @@
       g.addColorStop(0, C.deep); g.addColorStop(0.55, C.bg); g.addColorStop(1, '#031338');
       ctx.fillStyle = g; ctx.fillRect(-20, -20, W + 40, H + 40);
       // flat planets (slow parallax)
-      var wide = L === LAYOUTS.wide;
+      var wide = isWide;
       var big = wide ? 230 : 200, span = H + big * 2 + 200;
       var by = ((bgScroll * 0.6 + (wide ? 20 : 120)) % span) - big;
       ctx.fillStyle = C.blue;
@@ -762,7 +767,7 @@
       ctx.setTransform(sx, 0, 0, sy, shx * sx, shy * sy);
       ctx.lineJoin = 'round'; ctx.lineCap = 'round';
       drawStreaks();
-      var wide = L === LAYOUTS.wide;
+      var wide = isWide;
 
       // play, including the frozen sky after a run (no end card, no replay)
       if (phase !== 'intro') { drawPortal(0); drawPortal(1); }

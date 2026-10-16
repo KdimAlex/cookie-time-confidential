@@ -225,34 +225,44 @@ function tickText(ch, gapMs) {
   src.stop(now + heard + 0.02);
 }
 
+let typeHost = null;
+let typeFull = "";
+
 function stopTyping() {
   window.clearTimeout(typeTimer);
   typeTimer = 0;
   typing = false;
   terminal.classList.remove("is-typing");
+  if (typeHost) typeHost.classList.remove("is-typing");
+  typeHost = null;
   stopTextTick();
 }
 
 /* A terminal, not a metronome: most glyphs tick quickly, spaces rush,
-   punctuation hangs, and the occasional hitch breaks the rhythm. */
-function typeLine(text) {
+   punctuation hangs, and the occasional hitch breaks the rhythm.
+   host, when passed, is the quote plate's line. Same chirps, same clock. */
+function typeLine(text, host) {
   stopTyping();
   textAudio();
+  const target = host || line;
   const full = fill(text);
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduce || full.length < 2) {
-    line.textContent = full;
+    target.textContent = full;
     return;
   }
   const stamp = epoch;
   let i = 0;
-  line.textContent = "";
+  target.textContent = "";
   typing = true;
-  terminal.classList.add("is-typing");
+  typeHost = target;
+  typeFull = full;
+  const caret = target === line ? terminal : target;
+  caret.classList.add("is-typing");
   const stepChar = () => {
     if (stamp !== epoch) return;
     i += 1;
-    line.textContent = full.slice(0, i);
+    target.textContent = full.slice(0, i);
     const ch = full[i - 1];
     const last = i >= full.length;
     let delay = 14 + Math.random() * 26;
@@ -266,7 +276,8 @@ function typeLine(text) {
     tickText(ch, last ? null : delay);
     if (last) {
       typing = false;
-      terminal.classList.remove("is-typing");
+      caret.classList.remove("is-typing");
+      typeHost = null;
       return;
     }
     typeTimer = window.setTimeout(stepChar, delay);
@@ -277,9 +288,12 @@ function typeLine(text) {
 function finishTyping() {
   if (!typing) return false;
   const step = FLOW[current - 1];
+  const host = typeHost;
+  const quoted = host && host !== line ? typeFull : "";
   const text = guiding && step.playText ? step.playText : lineMore && step.moreText ? step.moreText : windowTilted && step.tiltText ? step.tiltText : step.text;
   stopTyping();
-  if (text) line.textContent = fill(text);
+  if (quoted && host) host.textContent = quoted;
+  else if (text) line.textContent = fill(text);
   return true;
 }
 
@@ -409,8 +423,8 @@ function mountQuote(step, entered) {
   plate.appendChild(wrap);
 }
 
-/* Rusty’s quote. The bubble art already draws the quote, so this screen
-   does not add a second line of type or the pass card.
+/* Rusty’s quote. The bubble chrome and portrait stay. The words type
+   into the field with the same terminal clock and chirp as the other lines.
    Stepping forward from the ID card adds .is-arriving. A direct load
    stays on the finished pose. */
 function mountRustyQuote(step, entered) {
@@ -418,20 +432,25 @@ function mountRustyQuote(step, entered) {
   wrap.className = "rusty-quote";
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (entered && !reduce) wrap.classList.add("is-arriving");
-  const bubble = document.createElement("img");
+  const bubble = document.createElement("div");
   bubble.className = "rusty-bubble";
-  bubble.src = "/kiosk/art/rusty-quote-bubble.svg?v=1";
-  bubble.alt = `“${step.quote}”`;
+  const chrome = document.createElement("img");
+  chrome.src = "/kiosk/art/rusty-quote-chrome.svg?v=1";
+  chrome.alt = "";
+  const words = document.createElement("p");
+  words.className = "quote-line";
+  bubble.append(chrome, words);
   const portrait = document.createElement("img");
   portrait.className = "rusty-portrait";
   portrait.src = "/kiosk/art/rusty-portrait.svg?v=1";
   portrait.alt = "";
   wrap.append(bubble, portrait);
   plate.appendChild(wrap);
+  typeLine(`“${step.quote}”`, words);
 }
 
 /* Charlie’s quote. Same size as Rusty’s, with the terminal’s double
-   green stroke around the field and the quote set inside it.
+   green stroke around the field. The quote types into that field.
    Stepping forward from the ID card adds .is-arriving. A direct load
    stays on the finished pose. */
 function mountDukeQuote(step, entered) {
@@ -444,10 +463,8 @@ function mountDukeQuote(step, entered) {
   const shape = document.createElement("img");
   shape.src = "/kiosk/art/speech-bubble.svg?v=2";
   shape.alt = "";
-  const words = document.createElement("img");
-  words.className = "duke-words";
-  words.src = "/kiosk/art/duke-quote.svg?v=1";
-  words.alt = `“${step.quote}”`;
+  const words = document.createElement("p");
+  words.className = "quote-line";
   bubble.append(shape, words);
   const portrait = document.createElement("img");
   portrait.className = "duke-portrait";
@@ -455,6 +472,7 @@ function mountDukeQuote(step, entered) {
   portrait.alt = "";
   wrap.append(bubble, portrait);
   plate.appendChild(wrap);
+  typeLine(`“${step.quote}”`, words);
 }
 
 function apolloMissionAt() {
@@ -474,7 +492,8 @@ function resolveMissionAt() {
 }
 
 /* One step, same wrap as the chevrons. Left arrow and a rightward swipe
-   both pass -1; right arrow and a leftward swipe both pass +1. */
+   both pass -1; right arrow and a leftward swipe both pass +1.
+   Swap the card only. The instructor line already said its piece. */
 function stepMission(dir) {
   const count = MISSIONS.length;
   const at = Number.isInteger(state.missionAt) ? state.missionAt : apolloMissionAt();
@@ -482,7 +501,8 @@ function stepMission(dir) {
   if (!MISSIONS[state.missionAt] || MISSIONS[state.missionAt].id === "skylab") {
     state.missionAt = apolloMissionAt();
   }
-  go(7);
+  plate.replaceChildren();
+  mountMission();
 }
 
 const MISSION_SCALE_MIN = 1;
@@ -530,7 +550,7 @@ function installMissionClickSwallow() {
     missionSwallowClick = false;
     window.clearTimeout(missionSwallowTimer);
     const target = event.target;
-    if (!(target instanceof Element) || !target.closest(".folder .go, .folder .pill, .file-row > .pill, .file-row .arrows button")) return;
+    if (!(target instanceof Element) || !target.closest(".folder .go, .folder .pill, .file-row > .pill, .file-row .confirm-mission, .file-row .arrows button")) return;
     event.preventDefault();
     event.stopPropagation();
   }, true);
@@ -731,6 +751,13 @@ const FILE_ART = {
   "scorpius": "constellation-scorpius.svg?v=1",
 };
 
+function stepFiles(dir) {
+  const order = ["ursa-major", "canis-major", "scorpius"];
+  state.fileAt = (state.fileAt + dir + order.length) % order.length;
+  plate.replaceChildren();
+  mountFiles();
+}
+
 function mountFiles() {
   const order = ["ursa-major", "canis-major", "scorpius"];
   const front = state.fileAt;
@@ -754,16 +781,17 @@ function mountFiles() {
     [-1, 1].forEach((dir) => {
       const button = chevron(dir);
       button.setAttribute("aria-label", dir < 0 ? "Previous constellation" : "Next constellation");
-      button.addEventListener("click", () => {
-        state.fileAt = (state.fileAt + dir + order.length) % order.length;
-        go(atFrame("Constellation files"));
-      });
+      button.addEventListener("click", () => stepFiles(dir));
       arrows.appendChild(button);
     });
     const start = document.createElement("button");
     start.type = "button";
-    start.className = "pill";
-    start.textContent = "Confirm Mission";
+    start.className = "confirm-mission";
+    start.setAttribute("aria-label", "Confirm Mission");
+    const face = document.createElement("img");
+    face.src = "/kiosk/art/confirm-mission.svg";
+    face.alt = "";
+    start.appendChild(face);
     start.addEventListener("click", () => {
       state.constellation = order[state.fileAt];
       state.round = 0;
@@ -771,10 +799,7 @@ function mountFiles() {
       go(atFrame("Game 1 — Constellation ID"));
     });
     row.append(arrows, start);
-  bindCarouselTouch(row, (dir) => {
-    state.fileAt = (state.fileAt + dir + order.length) % order.length;
-    go(atFrame("Constellation files"));
-  }, files);
+  bindCarouselTouch(row, stepFiles, files);
   plate.appendChild(row);
 }
 
@@ -858,9 +883,13 @@ function beginGuiding() {
   mountGuidingWidget();
 }
 
-function mountCookies() {
+/* Stepping forward plays the staggered settle. A direct ?at= holds
+   every cookie on the finished pose, still drifting. */
+function mountCookies(entered) {
   const wrap = document.createElement("div");
   wrap.className = "cookies";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (entered && !reduce) wrap.classList.add("is-arriving");
   [151, -61.55, 0].forEach((spin) => {
     const bit = document.createElement("span");
     bit.style.setProperty("--spin", `${spin}deg`);
@@ -913,14 +942,16 @@ function mountStarGlobe() {
   const wrap = document.createElement("div");
   wrap.className = "star-globe";
   const globe = document.createElement("img");
-  globe.src = "/kiosk/art/constellation-globe.png?v=1";
+  globe.src = "/kiosk/art/constellation-globe.png?v=3";
   globe.alt = "";
   wrap.append(globe);
   plate.appendChild(wrap);
 }
 
 /* Gaby’s whole star-navigation applet, played through. The card’s own
-   sky is transparent so the page field shows through. */
+   sky is transparent so the page field shows through.
+   Two stars only: the drawing is on screen, and the clock waits four
+   seconds. Leaving before that never starts it. */
 function mountTriangle() {
   const root = document.createElement("div");
   root.className = "triangle-live";
@@ -928,7 +959,14 @@ function mountTriangle() {
   root.setAttribute("data-star-now", "");
   root.setAttribute("data-star-chrome", "off");
   plate.append(root);
-  if (window.StarNavigation) window.StarNavigation.mount(root);
+  if (!window.StarNavigation) return;
+  const anim = window.StarNavigation.mount(root);
+  anim.pause();
+  const stamp = epoch;
+  window.setTimeout(() => {
+    if (stamp !== epoch) return;
+    anim.play();
+  }, 4000);
 }
 
 function mountLaunch(word, dest) {
@@ -936,24 +974,59 @@ function mountLaunch(word, dest) {
   wrap.className = "launch";
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "pill";
-  button.textContent = word;
-  button.addEventListener("click", () => go(dest));
+  button.className = "save-ship";
+  button.setAttribute("aria-label", word);
+  const face = document.createElement("img");
+  face.src = "/kiosk/art/save-the-ship.svg";
+  face.alt = "";
+  button.appendChild(face);
+  button.addEventListener("click", () => {
+    primeStorm();
+    go(dest);
+  });
   wrap.appendChild(button);
   plate.appendChild(wrap);
 }
 
 function mountIdle() {
   const wrap = document.createElement("div");
-  wrap.className = "idle";
-  const title = document.createElement("h1");
-  title.textContent = "COOKIE TIME";
+  wrap.className = "idle is-lockup";
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "cookie";
-  button.innerHTML = `<img src="/kiosk/art/cookie.png" alt=""><span>Tap to Start</span>`;
-  button.addEventListener("click", () => go(2));
-  wrap.append(title, button);
+  button.className = "lockup";
+  button.setAttribute("aria-label", "Tap to Start");
+  const face = document.createElement("span");
+  face.className = "lockup-face";
+  button.appendChild(face);
+  fetch("/kiosk/art/cookie-time-lockup.svg?v=1")
+    .then((res) => res.text())
+    .then((raw) => {
+      if (!button.isConnected) return;
+      face.innerHTML = raw.replace(/<\?xml[^>]*>/, "");
+    })
+    .catch(() => {});
+  /* The plate dips and the stamp flashes, then the flow continues.
+     Reduced motion, or a press whose animation never starts, still advances. */
+  button.addEventListener("click", () => {
+    if (button.dataset.starting === "1") return;
+    button.dataset.starting = "1";
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      go(2);
+      return;
+    }
+    button.classList.add("is-pressed");
+    const press = button.getAnimations().find((anim) => anim.animationName === "lockup-press");
+    if (!press) {
+      go(2);
+      return;
+    }
+    window.setTimeout(() => {
+      if (!button.isConnected) return;
+      go(2);
+    }, 200);
+  });
+  wrap.appendChild(button);
   plate.appendChild(wrap);
 }
 
@@ -1009,9 +1082,9 @@ function designationTitle(graded) {
 }
 
 /* Forward: the line is already solid. The medal parks on the left with the
-   title still blank, the meters rise, the designation types, then the
-   instructor terminal is removed, then the existing feed-off plays.
-   Hold is after the cloth has left.
+   title still blank, the meters rise, the designation types slowly, the
+   instructor console fades, the cloth holds, then the feed-off plays.
+   Frost and Train Again come after the cloth has left.
    A direct ?at= or reduced motion holds the composed pose instead. */
 const PRINT = {
   land: 0.28,
@@ -1019,8 +1092,9 @@ const PRINT = {
   stagger: 0.16,
   lag: 0.18,
   cause: 220,
-  payoff: 450,
-  hold: 3000,
+  payoff: 700,
+  fade: 1600,
+  hold: 8000,
 };
 
 function sketchSeconds() {
@@ -1148,19 +1222,88 @@ function mountPrint(entered) {
     if (!alive()) return;
     await wait(PRINT.payoff);
     if (!alive()) return;
-    wrap.dataset.finale = "away";
+    terminal.classList.add("is-leaving");
+    await wait(PRINT.fade);
+    if (!alive()) return;
     terminal.hidden = true;
+    terminal.classList.remove("is-leaving");
     line.textContent = "";
+    wrap.dataset.finale = "hold";
+    await wait(PRINT.hold);
+    if (!alive()) return;
+    wrap.dataset.finale = "away";
     if (typeof patch.sendOff === "function") await patch.sendOff();
     if (!alive()) return;
     wrap.dataset.finale = "quiet";
-    await wait(PRINT.hold);
-    if (!alive()) return;
-    if (current < FLOW.length && FLOW[current - 1] && FLOW[current - 1].kind === "print") go(current + 1);
+    showFrost();
   });
 }
 
+function clearFrost() {
+  document.body.classList.remove("is-frosted");
+  const veil = document.getElementById("frost");
+  if (veil) veil.remove();
+}
+
+function showFrost() {
+  const host = document.getElementById("kiosk");
+  if (!host || document.getElementById("frost")) return;
+  const veil = document.createElement("div");
+  veil.id = "frost";
+  veil.className = "frost";
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "train-again";
+  button.setAttribute("aria-label", "Train Again?");
+  const face = document.createElement("img");
+  face.src = "/kiosk/art/train-again.svg?v=3";
+  face.alt = "";
+  button.appendChild(face);
+  button.addEventListener("click", () => restart());
+  veil.appendChild(button);
+  host.appendChild(veil);
+  document.body.classList.add("is-frosted");
+  window.requestAnimationFrame(() => veil.classList.add("is-on"));
+}
+
+/* The frosted print stays on top for one crossfade into Idle.
+   Reduced motion drops it and cuts, the same as every other jump. */
+const RESTART_FADE_MS = 620;
+
+function holdPrintFrame() {
+  const host = document.getElementById("kiosk");
+  const veil = document.getElementById("frost");
+  if (!host || !veil) return null;
+  const ghost = document.createElement("div");
+  ghost.className = "restart-ghost";
+  ghost.setAttribute("aria-hidden", "true");
+  ghost.inert = true;
+  const backdrop = document.getElementById("world");
+  if (backdrop && backdrop.getAttribute("src")) {
+    const bg = document.createElement("img");
+    bg.alt = "";
+    bg.src = backdrop.currentSrc || backdrop.src;
+    bg.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;";
+    ghost.appendChild(bg);
+  }
+  [...plate.children].forEach((child) => {
+    const copy = child.cloneNode(true);
+    if (copy.id) copy.removeAttribute("id");
+    copy.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+    if (copy.classList && copy.classList.contains("report")) copy.classList.add("is-settled");
+    ghost.appendChild(copy);
+  });
+  const frost = veil.cloneNode(true);
+  frost.removeAttribute("id");
+  frost.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+  ghost.appendChild(frost);
+  host.appendChild(ghost);
+  return ghost;
+}
+
 function restart() {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ghost = reduce ? null : holdPrintFrame();
   state.name = "";
   state.mission = "apollo";
   state.constellation = "canis-major";
@@ -1173,27 +1316,181 @@ function restart() {
   state.round = 0;
   nameInput.value = "";
   go(1);
+  if (!ghost) return;
+  const leave = () => {
+    if (!ghost.isConnected || ghost.classList.contains("is-leaving")) return;
+    ghost.classList.add("is-leaving");
+    window.setTimeout(() => {
+      if (ghost.isConnected) ghost.remove();
+    }, RESTART_FADE_MS + 80);
+  };
+  window.requestAnimationFrame(() => window.requestAnimationFrame(leave));
+  window.setTimeout(leave, 48);
 }
 
 function stormAudio() {
   return document.getElementById("storm-crash");
 }
 
-/* Unlock during the click that leaves Almost done, then pause at the
-   start so the crash itself does not play until the ship is on screen. */
-function armStorm() {
-  const audio = stormAudio();
-  if (!audio) return;
-  audio.volume = 0;
-  const finish = () => {
-    if (audio.dataset.cue === "1") return;
-    audio.pause();
-    audio.currentTime = 0;
-    audio.volume = 1;
+/* The mp3 element seeks late, so the crack arrived after the bolt.
+   Decode once into the typewriter context, which is already running,
+   and start the buffer on that clock when the flash happens. A second
+   context has to wake the output device and the crack lands late. */
+let stormBuf = null;
+let stormLoad = null;
+let stormNode = null;
+let stormPlay = 0;
+let stormFade = 0;
+
+function loadStorm() {
+  if (stormBuf) return Promise.resolve(stormBuf);
+  if (stormLoad) return stormLoad;
+  const ctx = textAudio();
+  if (!ctx) return Promise.resolve(null);
+  stormLoad = fetch("/lightning.mp3")
+    .then((res) => res.arrayBuffer())
+    .then((bytes) => ctx.decodeAudioData(bytes.slice(0)))
+    .then((buffer) => {
+      stormBuf = buffer;
+      stormLoad = null;
+      return buffer;
+    })
+    .catch(() => {
+      stormLoad = null;
+      return null;
+    });
+  return stormLoad;
+}
+
+/* A silent loop keeps the output device awake from the click through
+   the watch, so the crack does not wait for it to spin up. */
+let stormKeep = null;
+
+function holdStorm() {
+  const ctx = textAudio();
+  if (!ctx || stormKeep) return;
+  const start = () => {
+    if (ctx.state !== "running" || stormKeep) return;
+    const buf = ctx.createBuffer(1, Math.max(1, ctx.sampleRate >> 1), ctx.sampleRate);
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    src.buffer = buf;
+    src.loop = true;
+    gain.gain.value = 0;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(ctx.currentTime);
+    stormKeep = src;
   };
-  const pending = audio.play();
-  if (pending && typeof pending.then === "function") pending.then(finish).catch(() => { audio.volume = 1; });
-  else finish();
+  if (ctx.state === "suspended") ctx.resume().then(start).catch(() => {});
+  else start();
+}
+
+function releaseStorm() {
+  if (!stormKeep) return;
+  try { stormKeep.stop(); } catch (err) { /* already ended */ }
+  stormKeep = null;
+}
+
+function primeStorm() {
+  loadStorm();
+  holdStorm();
+}
+
+/* Unlock during the click that leaves Almost done. The crash itself
+   waits for the flash. */
+function armStorm() {
+  primeStorm();
+  const html = stormAudio();
+  if (!html) return;
+  html.pause();
+  try { html.currentTime = 0; } catch (err) { /* seek when the click is still fresh */ }
+}
+
+/* The crack, the second blast (~0.96–1.22s), and the rumble are one hit.
+   The file is ~4.03s. The last audible ring is gone by ~3.46s and the
+   rest is silence. Hold full level through that ring, then a raised-cosine
+   fade reaches 0 at 3.64s. Playback stops at 3.70s, after the gain is
+   already 0, so the tail is not cut. */
+const STORM_HOLD = 3.46;
+const STORM_SILENT = 3.64;
+const STORM_END = 3.70;
+
+function stormTailGain(p) {
+  return 0.5 * (1 + Math.cos(Math.PI * p));
+}
+
+function cancelStormFade() {
+  if (!stormFade) return;
+  cancelAnimationFrame(stormFade);
+  stormFade = 0;
+}
+
+/* /lightning.mp3 plays from the start of this turn through the rumble.
+   When the typewriter context is already running, the buffer starts now.
+   Otherwise the parked element plays from 0 and fades on the same clock.
+   Nothing here waits on resume or decode — that wait was the late second blast. */
+function playStormCrack() {
+  const html = stormAudio();
+  const ctx = textAudio();
+  const token = ++stormPlay;
+  cancelStormFade();
+  if (ctx && ctx.state === "running" && stormBuf) {
+    if (html) {
+      html.volume = 1;
+      if (!html.paused) html.pause();
+    }
+    if (stormNode) {
+      try { stormNode.stop(); } catch (err) { /* already ended */ }
+      stormNode = null;
+    }
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    source.buffer = stormBuf;
+    const now = ctx.currentTime;
+    const span = STORM_SILENT - STORM_HOLD;
+    gain.gain.setValueAtTime(1, now);
+    gain.gain.setValueAtTime(1, now + STORM_HOLD);
+    for (let i = 1; i <= 24; i++) {
+      const p = i / 24;
+      gain.gain.linearRampToValueAtTime(stormTailGain(p), now + STORM_HOLD + span * p);
+    }
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(now, 0, STORM_END);
+    stormNode = source;
+    source.onended = () => {
+      if (stormNode === source) stormNode = null;
+    };
+    return true;
+  }
+  primeStorm();
+  if (!html) return false;
+  html.volume = 1;
+  html.pause();
+  try { html.currentTime = 0; } catch (err) { /* play from wherever it already sits */ }
+  const played = html.play();
+  if (played && typeof played.catch === "function") played.catch(() => {});
+  const started = performance.now();
+  const tick = (now) => {
+    if (token !== stormPlay) return;
+    const elapsed = (now - started) / 1000;
+    if (elapsed >= STORM_SILENT) html.volume = 0;
+    else if (elapsed > STORM_HOLD) {
+      html.volume = stormTailGain((elapsed - STORM_HOLD) / (STORM_SILENT - STORM_HOLD));
+    }
+    if (elapsed < STORM_END) stormFade = requestAnimationFrame(tick);
+    else stormFade = 0;
+  };
+  stormFade = requestAnimationFrame(tick);
+  window.setTimeout(() => {
+    if (token !== stormPlay) return;
+    cancelStormFade();
+    html.volume = 0;
+    html.pause();
+    try { html.currentTime = 0; } catch (err) { /* already parked */ }
+  }, STORM_END * 1000);
+  return true;
 }
 
 /* One cue: the white flash and /lightning.mp3 (the find game's thunder)
@@ -1202,25 +1499,24 @@ function strikeStorm() {
   const audio = stormAudio();
   if (audio && audio.dataset.cue === "1") return;
   const flash = document.getElementById("storm-flash");
-  if (audio) {
-    audio.dataset.cue = "1";
-    audio.volume = 1;
-    audio.pause();
-    audio.currentTime = 0;
-  }
+  if (audio) audio.dataset.cue = "1";
   if (flash) {
     flash.classList.remove("is-on");
     void flash.offsetWidth;
     flash.classList.add("is-on");
   }
-  if (!audio) return;
-  const pending = audio.play();
-  if (pending && typeof pending.catch === "function") pending.catch(() => {});
+  playStormCrack();
 }
 
 function quietStorm() {
   const audio = stormAudio();
   const flash = document.getElementById("storm-flash");
+  stormPlay += 1;
+  if (stormNode) {
+    try { stormNode.stop(); } catch (err) { /* already ended */ }
+    stormNode = null;
+  }
+  releaseStorm();
   if (flash) flash.classList.remove("is-on");
   if (!audio) return;
   audio.pause();
@@ -1243,6 +1539,7 @@ function mountStorm(cueEpoch) {
 }
 
 function go(n, holdWorld, holdSlot) {
+  clearFrost();
   n = Math.max(1, Math.min(FLOW.length, n));
   const prev = current;
   const prevStep = FLOW[prev - 1];
@@ -1287,9 +1584,11 @@ function go(n, holdWorld, holdSlot) {
   }
   nameBox.hidden = true;
   const talking = Boolean(step.text);
+  terminal.classList.remove("is-leaving");
   terminal.hidden = !talking;
   cast.hidden = !talking || step.kind === "print";
   terminal.classList.toggle("is-tap", step.kind === "say" || step.kind === "sky" || (step.kind === "files" && !!step.moreText));
+  terminal.classList.toggle("is-caret-still", step.plate === "angle");
   if (step.kind === "print") {
     terminal.classList.remove("is-tap", "is-typing");
     line.textContent = fill(step.text);
@@ -1309,7 +1608,7 @@ function go(n, holdWorld, holdSlot) {
   if (step.kind === "quote") mountQuote(step, prev + 1 === n);
   if (step.kind === "files") mountFiles();
   if (step.kind === "ident") state.constellationMarks = [];
-  if (step.plate === "cookies") mountCookies();
+  if (step.plate === "cookies") mountCookies(prev + 1 === n);
   if (step.play === "guiding") mountStarTap();
   if (step.plate === "landmarks") mountLandmarks();
   if (step.plate === "globe") mountGlobe();
@@ -1330,7 +1629,8 @@ function go(n, holdWorld, holdSlot) {
   if (step.kind === "align" || step.kind === "find" || step.kind === "ident") {
     slot.hidden = false;
     slot.style.touchAction = step.kind === "align" ? "none" : "";
-    slot.src = step.kind === "align" ? "/orient?v=85" : step.kind === "find" ? "/find" : "/constellation-run?v=7";
+    slot.src = step.kind === "align" ? "/orient?v=93" : step.kind === "find" ? "/find?v=93" : "/constellation-run?v=8";
+    if (step.kind === "find") primeStorm();
   }
   if (step.kind === "print") mountPrint(prev + 1 === n);
   const url = new URL(location.href);
@@ -1378,10 +1678,12 @@ function crossToWorld() {
         el.style.opacity = "0";
         const img = el.querySelector("img");
         if (!img) return;
-        /* Freeze the drift when this cookie's fade starts. Opacity is the
-           only thing that moves after that, so the two don't jitter. */
+        /* Pin the drift pose when this cookie's fade starts. The leave
+           only changes opacity, so the translate does not snap back. */
         window.setTimeout(() => {
-          img.style.animationPlayState = "paused";
+          const pose = getComputedStyle(img).transform;
+          img.style.animation = "none";
+          img.style.transform = pose;
         }, i * cookieStep);
       });
     });
@@ -1498,7 +1800,7 @@ function crossFromLandmarks() {
   const preload = new Image();
   preload.addEventListener("load", begin, { once: true });
   preload.addEventListener("error", begin, { once: true });
-  preload.src = "/kiosk/art/constellation-globe.png?v=1";
+  preload.src = "/kiosk/art/constellation-globe.png?v=3";
   if (preload.complete) begin();
 }
 
@@ -1541,6 +1843,7 @@ function crossToWindow() {
     terminal.hidden = false;
     cast.hidden = false;
     terminal.classList.add("is-tap");
+    terminal.classList.remove("is-caret-still");
     typeLine(step.text);
     syncBadge(n, n - 1);
     const url = new URL(location.href);
@@ -1694,6 +1997,10 @@ function next() {
     crossToWorld();
     return;
   }
+  if (step.kind === "find" && upcoming && upcoming.frame === "Certified") {
+    fadeInCertified();
+    return;
+  }
   if (current < FLOW.length) go(current + 1);
 }
 
@@ -1791,6 +2098,61 @@ window.addEventListener("keyup", (event) => {
   forwardSlotKey(event);
 });
 
+/* Find ends on the ship. That frame stays solid, and the building,
+   astronaut, and bubble fade in over it. Fading both at once dipped
+   through the black stage. The line waits until the fade has landed. */
+function fadeInCertified() {
+  if (crossing) return;
+  const step = FLOW[current - 1];
+  if (!step || step.kind !== "find") return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) {
+    go(current + 1);
+    return;
+  }
+  const scene = [world, cast, terminal];
+  crossing = true;
+  slot.style.pointerEvents = "none";
+  slot.style.transition = "none";
+  slot.style.opacity = "1";
+  slot.style.zIndex = "3";
+  go(current + 1, false, true);
+  const fadeEpoch = epoch;
+  slot.hidden = false;
+  scene.forEach((el, i) => {
+    el.style.transition = "none";
+    el.style.opacity = "0";
+    el.style.zIndex = String(6 + i);
+  });
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      if (epoch !== fadeEpoch) return;
+      scene.forEach((el) => {
+        el.style.transition = "opacity 1.15s ease";
+        el.style.opacity = "1";
+      });
+    });
+  });
+  window.setTimeout(() => {
+    if (!crossing || epoch !== fadeEpoch) return;
+    slot.hidden = true;
+    slot.style.transition = "none";
+    slot.style.opacity = "";
+    slot.style.zIndex = "";
+    slot.style.pointerEvents = "";
+    slot.style.touchAction = "";
+    if (slot.getAttribute("src")) slot.removeAttribute("src");
+    scene.forEach((el) => {
+      el.style.transition = "";
+      el.style.opacity = "";
+      el.style.zIndex = "";
+    });
+    crossing = false;
+    const arrived = FLOW[current - 1];
+    if (arrived && arrived.text && arrived.kind !== "print") typeLine(arrived.text);
+  }, 1200);
+}
+
 /* The run already held the hit or miss. Fade that surface off and let
    the second award show through. The line waits until the game is gone
    so the speech stays solid. Reduced motion cuts. */
@@ -1858,6 +2220,10 @@ window.addEventListener("message", (event) => {
     if (data.done) revealAlign();
     return;
   }
+  if (data.source === "morehead-lightning") {
+    playStormCrack();
+    return;
+  }
   if (data.source === "morehead-game") {
     if (data.game === "align") state.alignMarks = data.marks;
     if (data.game === "find") state.findMarks = data.marks;
@@ -1894,6 +2260,7 @@ const params = new URLSearchParams(location.search);
 const at = Number(params.get("at"));
 loadTextTick();
 go(Number.isFinite(at) && at >= 1 && at <= FLOW.length ? at : 1);
+window.__kioskTrain = { showFrost, restart };
 
 /* The align and find bed. One player for the whole kiosk, so the games
    do not start a second copy. A seek just before the end skips the
@@ -1967,8 +2334,9 @@ function loopKioskBed() {
   if (duration > 2 && time > 1 && duration - time < 0.35) bed.seekTo(0, true);
 }
 
-window.addEventListener("pointerdown", () => { startKioskBed(); textAudio(); loadTextTick(); }, true);
-window.addEventListener("keydown", () => { startKioskBed(); textAudio(); loadTextTick(); }, true);
+window.addEventListener("pointerdown", () => { startKioskBed(); textAudio(); loadTextTick(); primeStorm(); }, true);
+window.addEventListener("keydown", () => { startKioskBed(); textAudio(); loadTextTick(); primeStorm(); }, true);
 loadTextTick();
+loadStorm();
 loadKioskBed();
 window.setInterval(loopKioskBed, 200);

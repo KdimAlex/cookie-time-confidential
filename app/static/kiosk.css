@@ -165,8 +165,8 @@ body.is-mission #cast { z-index: 4; }
 .cookies span {
   position: absolute;
   display: block;
-  opacity: 0;
-  animation: cookie-in 0.55s ease forwards;
+  /* Direct ?at= and a step back land here: already in, already drifting. */
+  opacity: 1;
 }
 
 .cookies img {
@@ -175,19 +175,29 @@ body.is-mission #cast { z-index: 4; }
   height: auto;
   transform: rotate(var(--spin));
   /* Drift lives on the image so it multiplies with the span's settle
-     and never shares a transform with the leave fade. */
+     and never shares a transform with the leave fade. Opacity stays 1. */
   animation: cookie-float 16s ease-in-out infinite backwards;
 }
 
-/* DOM order is left, center, right. Each settles once, then holds.
-   The float waits until that cookie's 0.55s settle has finished.
-   Different periods keep the three from moving in lockstep. */
-.cookies span:nth-child(1) { left: 16.7%; top: 11%; width: 20.1%; animation-delay: 0s; }
-.cookies span:nth-child(2) { left: 38.6%; top: 45%; width: 21.9%; animation-delay: 0.42s; }
-.cookies span:nth-child(3) { left: 67.8%; top: 11%; width: 19%; animation-delay: 0.84s; }
-.cookies span:nth-child(1) img { animation-delay: 0.55s; }
-.cookies span:nth-child(2) img { animation-delay: 0.97s; animation-duration: 19s; }
-.cookies span:nth-child(3) img { animation-delay: 1.39s; animation-duration: 13s; }
+/* DOM order is left, center, right. Different periods keep the three
+   from moving in lockstep. Walking in adds .is-arriving: each settles
+   once, then the float waits out that 0.55s. */
+.cookies span:nth-child(1) { left: 16.7%; top: 11%; width: 20.1%; }
+.cookies span:nth-child(2) { left: 38.6%; top: 45%; width: 21.9%; }
+.cookies span:nth-child(3) { left: 67.8%; top: 11%; width: 19%; }
+.cookies span:nth-child(2) img { animation-duration: 19s; }
+.cookies span:nth-child(3) img { animation-duration: 13s; }
+
+.cookies.is-arriving span {
+  opacity: 0;
+  animation: cookie-in 0.55s ease forwards;
+}
+.cookies.is-arriving span:nth-child(1) { animation-delay: 0s; }
+.cookies.is-arriving span:nth-child(2) { animation-delay: 0.42s; }
+.cookies.is-arriving span:nth-child(3) { animation-delay: 0.84s; }
+.cookies.is-arriving span:nth-child(1) img { animation-delay: 0.55s; }
+.cookies.is-arriving span:nth-child(2) img { animation-delay: 0.97s; }
+.cookies.is-arriving span:nth-child(3) img { animation-delay: 1.39s; }
 
 @keyframes cookie-in {
   from { opacity: 0; transform: translateY(12px); }
@@ -202,12 +212,14 @@ body.is-mission #cast { z-index: 4; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cookies span {
+  .cookies span,
+  .cookies.is-arriving span {
     animation: none;
     opacity: 1;
     transform: none;
   }
-  .cookies img {
+  .cookies img,
+  .cookies.is-arriving img {
     animation: none;
     transform: rotate(var(--spin));
   }
@@ -253,9 +265,16 @@ body[data-mode="game"] #plate { pointer-events: none; }
   background: url("/kiosk/art/speech-bubble.svg") top left / 100% var(--ctc-bubble-art-height) no-repeat;
   color: var(--green);
   cursor: default;
+  transition: opacity 1.6s ease;
 }
 
 #terminal.is-tap { cursor: pointer; }
+
+#terminal.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.6s ease;
+}
 
 #who {
   position: absolute;
@@ -361,6 +380,80 @@ body.is-duke-quote #plate { bottom: 0; }
   place-items: center;
   align-content: center;
   gap: 18px;
+}
+
+.idle.is-lockup {
+  display: block;
+}
+
+.lockup {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: #0c0c0d;
+  cursor: pointer;
+  transform-origin: center center;
+}
+
+.lockup-face,
+.lockup-face svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Idle tap only. The SVG stamp-pulse keeps looping until this class lands. */
+.lockup.is-pressed {
+  animation: lockup-press 200ms ease-out forwards;
+}
+
+.lockup.is-pressed .stamp {
+  animation: stamp-flash 200ms ease-out forwards;
+}
+
+.lockup.is-pressed svg > g[fill="#42f489"] {
+  animation: tap-brighten 200ms ease-out forwards;
+}
+
+@keyframes lockup-press {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.955); }
+  100% { transform: scale(0.978); }
+}
+
+@keyframes stamp-flash {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 0 rgba(66, 244, 137, 0));
+  }
+  32% {
+    transform: scale(1.04);
+    opacity: 1;
+    filter: drop-shadow(0 0 14px #42f489);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 0 rgba(66, 244, 137, 0));
+  }
+}
+
+@keyframes tap-brighten {
+  0% { filter: drop-shadow(0 0 0 rgba(66, 244, 137, 0)); }
+  32% { filter: drop-shadow(0 0 8px #42f489); }
+  100% { filter: drop-shadow(0 0 0 rgba(66, 244, 137, 0)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lockup.is-pressed,
+  .lockup.is-pressed .stamp,
+  .lockup.is-pressed svg > g[fill="#42f489"] {
+    animation: none;
+  }
 }
 
 .idle h1 {
@@ -492,6 +585,56 @@ body.is-duke-quote #plate { bottom: 0; }
   left: 50%;
   bottom: 1.05%;
   transform: translateX(-50%);
+}
+
+/* The Choose a mission button, the same artwork, at the same size. */
+.file-row .confirm-mission {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 3.2%;
+  width: calc(0.4371 * min(69%, 100% - 120px));
+  aspect-ratio: 459 / 97;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translateX(-50%);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.file-row .confirm-mission img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* Save the Ship uses the Choose a mission pill, with its own lettering
+   drawn in that same face. */
+.launch .save-ship {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 1.05%;
+  width: calc(0.4371 * min(69%, 100% - 120px));
+  aspect-ratio: 459 / 97;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.launch .save-ship img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
 }
 
 .folder-top { display: contents; }
@@ -799,6 +942,12 @@ button.pill {
   top: 4.3%;
 }
 
+.rusty-bubble img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .rusty-portrait {
   left: 50%;
   bottom: 0;
@@ -868,12 +1017,41 @@ button.pill {
   height: 100%;
 }
 
-.duke-bubble img.duke-words {
+.quote-line {
   position: absolute;
-  left: 10.5%;
-  top: 14.05%;
-  width: 79%;
-  height: auto;
+  margin: 0;
+  color: var(--green);
+  font-family: var(--ctc-font-dialogue);
+  /* Quote plates only. Sized to the bubble field; Charlie’s longer line is the fit. */
+  font-size: 2.54cqw;
+  line-height: 1.24;
+  letter-spacing: 0.01em;
+  overflow: hidden;
+}
+
+.rusty-bubble .quote-line {
+  left: 7%;
+  right: 7%;
+  top: 20%;
+  bottom: 14%;
+}
+
+.duke-bubble .quote-line {
+  left: 8%;
+  right: 8%;
+  top: 18%;
+  bottom: 16%;
+}
+
+.quote-line.is-typing::after {
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.95em;
+  margin-left: 4px;
+  background: var(--green);
+  vertical-align: -0.12em;
+  animation: blink 1.05s steps(1) infinite;
 }
 
 .duke-portrait {
@@ -972,6 +1150,62 @@ button.pill {
 .trace svg, .diagram svg, .globe-wrap svg { width: min(520px, 70%); height: auto; }
 
 .trace svg { touch-action: none; cursor: crosshair; background: var(--space); border-radius: 12px; }
+
+.frost {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 14, 16, 0.42);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.frost.is-on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The sticker layer sits above the kiosk. Once the cloth has left,
+   lift the stage so the frost covers it and the button stays on top. */
+body.is-frosted #kiosk { z-index: 60; }
+
+.frost .train-again {
+  width: calc(0.4371 * min(69%, 100% - 120px));
+  aspect-ratio: 459 / 97;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.frost .train-again img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* Train Again holds the frosted print over Idle, then lets it go. */
+.restart-ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: #000;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.restart-ghost.is-leaving {
+  opacity: 0;
+  transition: opacity 0.62s ease;
+}
 
 /* Print finale. The medal sits large on the left. These meters rule in
    on its right and fill to the score. They stay put when the cloth exits. */
@@ -1261,6 +1495,12 @@ body.is-triangle #kiosk {
   opacity: 0;
 }
 
+/* Frame 20 only. The block stays put; blink returns once this class drops. */
+#terminal.is-caret-still.is-tap #line::after,
+#terminal.is-caret-still.is-typing #line::after {
+  animation: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .cookie, .near, #terminal.is-tap #line::after, #terminal.is-typing #line::after { animation: none; }
+  .cookie, .near, #terminal.is-tap #line::after, #terminal.is-typing #line::after, .quote-line.is-typing::after { animation: none; }
 }

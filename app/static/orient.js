@@ -440,9 +440,44 @@ function loadLightning() {
     });
 }
 
-/* True only once the crack can start in this turn. A cold first decode
-   used to return here and play later, after the flash had already run. */
+/* Play the decoded crack in this frame when its context is already
+   running, in the same turn as the bolt. Otherwise the kiosk plays it
+   on the context the click unlocked. Seeking the mp3 element from here
+   played the bolt, then the sound, seconds later. */
 function playLightning() {
+  /* Every Find bolt, including later rounds, asks the kiosk to crack.
+     Playing it in this frame once its own context woke up skipped the
+     parent on rounds two and three. */
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ source: "morehead-lightning" }, location.origin);
+      return true;
+    }
+  } catch (err) {
+    /* standalone /find plays the buffer below */
+  }
+  if (audio && audio.state === "running" && lightningBuffer) {
+    if (lightningSource) {
+      try { lightningSource.stop(); } catch (err) { /* already ended */ }
+      lightningSource = null;
+    }
+    const source = audio.createBufferSource();
+    source.buffer = lightningBuffer;
+    const mix = audio.createGain();
+    const now = audio.currentTime;
+    const dur = 0.78;
+    mix.gain.setValueAtTime(0.75, now);
+    mix.gain.setValueAtTime(0.75, now + 0.68);
+    mix.gain.linearRampToValueAtTime(0.0001, now + dur);
+    source.connect(mix);
+    mix.connect(audio.destination);
+    source.start(now, 0, dur);
+    lightningSource = source;
+    source.onended = () => {
+      if (lightningSource === source) lightningSource = null;
+    };
+    return true;
+  }
   armAudio();
   if (!audio) return false;
   if (!lightningBuffer) {
@@ -473,7 +508,7 @@ function playLightning() {
   mix.gain.value = 0.75;
   source.connect(mix);
   mix.connect(audio.destination);
-  source.start(audio.currentTime);
+  source.start(audio.currentTime, 0, 0.78);
   lightningSource = source;
   source.onended = () => {
     if (lightningSource === source) lightningSource = null;
@@ -685,19 +720,6 @@ function beginWatch(i) {
   later(beginStrike, current.watch);
 }
 
-function introCrashLeft() {
-  try {
-    if (!window.parent || window.parent === window) return 0;
-    const clip = window.parent.document.getElementById("storm-crash");
-    if (!clip || clip.paused || !Number.isFinite(clip.duration)) return 0;
-    return Math.max(0, clip.duration - clip.currentTime);
-  } catch (err) {
-    return 0;
-  }
-}
-
-/* The thunderstorm clip starts on the previous screen. Leaving it
-   running put its crack seconds before this round's flash. */
 function quietParentStorm() {
   try {
     if (!window.parent || window.parent === window) return;
@@ -712,17 +734,8 @@ function quietParentStorm() {
 let strikeHold = 0;
 
 function beginStrike() {
-  /* Level 1 is the only round that can still be inside that clip.
-     Waiting it out, then adding 40ms, fired the flash after the crack.
-     Later rounds already strike on the watch timer. */
-  if (index === 0) quietParentStorm();
-  else {
-    const wait = introCrashLeft();
-    if (wait > 0.05) {
-      later(beginStrike, Math.ceil(wait * 1000) + 40);
-      return;
-    }
-  }
+  /* Restart the crack on this flash. Waiting out the previous play
+     pushed the sound seconds past the bolt. */
   if (!playLightning() && strikeHold < 6) {
     strikeHold += 1;
     later(beginStrike, 40);
@@ -1018,7 +1031,7 @@ function showResult() {
     rows = marks.map((mark) => `<li><span>${mark.name}</span><span>${mark.percent}%</span></li>`);
   }
   marksEl.innerHTML = rows.join("") + `<li class="total"><span></span><span>${total}%</span></li>`;
-  writeConsole(["COMPLETE", `${total}%`]);
+  writeConsole([play === "find" ? "COMPLETE" : "Final Score", `${total}%`]);
   marksEl.hidden = true;
   again.hidden = true;
   swap.hidden = true;

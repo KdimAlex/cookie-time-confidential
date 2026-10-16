@@ -329,8 +329,8 @@ body.is-find.is-seek #port {
   z-index: 4;
   left: 50%;
   bottom: 0;
-  width: min(52vw, 340px);
-  height: 136px;
+  width: calc(min(52vw, 340px) * 1.4);
+  height: calc(136px * 1.4);
   translate: -50% 0;
   display: none;
   touch-action: none;
@@ -359,10 +359,10 @@ body.is-find #joy-base {
 #joy-stick {
   position: absolute;
   left: 50%;
-  bottom: -42px;
-  width: 179px;
-  height: 179px;
-  margin-left: -86px;
+  bottom: calc(-42px * 1.4);
+  width: calc(179px * 1.4);
+  height: calc(179px * 1.4);
+  margin-left: calc(-86px * 1.4);
   background: none;
   transform-origin: 47.8% 97%;
   pointer-events: none;
